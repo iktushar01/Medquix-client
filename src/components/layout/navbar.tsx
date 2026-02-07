@@ -1,14 +1,13 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { Menu } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
-import {
-  Accordion,
-} from "@/components/ui/accordion";
+import { Accordion } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import {
   NavigationMenu,
@@ -49,8 +48,14 @@ const Navbar = ({ className }: NavbarProps) => {
         <nav className="hidden items-center justify-between lg:flex">
           {/* Left */}
           <div className="flex items-center gap-6">
-            <Link href="/" className="text-xl font-bold tracking-tight">
-              MediStore 💊
+            <Link href="/">
+              <Image
+                src="https://i.postimg.cc/Bv1xhwD0/logo.png"
+                alt="MediStore Logo"
+                width={80}
+                height={10}
+                priority
+              />
             </Link>
 
             <NavigationMenu>
@@ -85,9 +90,15 @@ const Navbar = ({ className }: NavbarProps) => {
 
         {/* ================= MOBILE ================= */}
         <div className="block lg:hidden">
-          <div className="flex items-center justify-between">
-            <Link href="/" className="text-lg font-bold">
-              MediStore 💊
+          <div className="flex items-center justify-between px-3">
+            <Link href="/">
+              <Image
+                src="https://i.postimg.cc/Bv1xhwD0/logo.png"
+                alt="MediStore Logo"
+                width={60}
+                height={150}
+                priority
+              />
             </Link>
 
             <Sheet>
