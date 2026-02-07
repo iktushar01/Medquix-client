@@ -23,7 +23,10 @@ export function LoginForm({
       provider: "google",
       callbackURL: "http://localhost:3000" // Redirect URL after successful login
     })
+    console.log(data)
   }
+  const section = authClient.useSession()
+  console.log(section)
   return (
     <form className={cn("flex flex-col gap-6", className)} {...props}>
       <FieldGroup>
