@@ -11,20 +11,13 @@ import {
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { authClient } from "@/lib/auth-client"
+import { handleGoogleLogin } from "@/lib/handleGoogleLogin";
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"form">) {
 
-  const handleGoogleLogin = () => {
-    // Implement Google login logic here
-    const data = authClient.signIn.social({
-      provider: "google",
-      callbackURL: "http://localhost:3000" // Redirect URL after successful login
-    })
-    console.log(data)
-  }
   const section = authClient.useSession()
   console.log(section)
   return (

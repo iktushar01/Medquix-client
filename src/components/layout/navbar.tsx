@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/sheet";
 import { ModeToggle } from "../ui/modeToggle";
 
+/* -------------------- Types -------------------- */
 interface MenuItem {
   title: string;
   url: string;
@@ -35,23 +36,51 @@ interface NavbarProps {
   className?: string;
 }
 
-const menu: MenuItem[] = [
+interface User {
+  role?: string;
+  [key: string]: unknown;
+}
+
+/* -------------------- Public Menu -------------------- */
+const publicMenu: MenuItem[] = [
   { title: "Home", url: "/" },
   { title: "Shop", url: "/shop" },
   { title: "Blog", url: "/blog" },
   { title: "Contact", url: "/contact" },
 ];
 
+/* -------------------- Role Based Menu -------------------- */
+const roleMenus: Record<string, MenuItem[]> = {
+  USER: [
+    { title: "Cart", url: "/cart" },
+    { title: "My Orders", url: "/orders" },
+  ],
+  SELLER: [
+    { title: "Dashboard", url: "/seller/dashboard" },
+    { title: "Medicines", url: "/seller/medicines" },
+    { title: "Orders", url: "/seller/orders" },
+  ],
+  ADMIN: [
+    { title: "Dashboard", url: "/admin" },
+    { title: "Users", url: "/admin/users" },
+    { title: "Orders", url: "/admin/orders" },
+    { title: "Categories", url: "/admin/categories" },
+  ],
+};
+
 const Navbar = ({ className }: NavbarProps) => {
   const { data, isPending } = useSession();
   const user = data?.user;
+  const role = (user as User)?.role;
+
+  const dashboardMenu = role ? roleMenus[role] ?? [] : [];
 
   const handleLogout = async () => {
     await authClient.signOut();
   };
 
   return (
-    <section className={cn("py-4 border-b", className)}>
+    <section className={cn("border-b py-4", className)}>
       <div className="container mx-auto">
         {/* ================= DESKTOP ================= */}
         <nav className="hidden items-center justify-between lg:flex">
@@ -69,18 +98,33 @@ const Navbar = ({ className }: NavbarProps) => {
 
             <NavigationMenu>
               <NavigationMenuList>
-                {menu.map((item) => (
+                {publicMenu.map((item) => (
                   <NavigationMenuItem key={item.title}>
                     <NavigationMenuLink asChild>
                       <Link
                         href={item.url}
-                        className="inline-flex h-10 items-center rounded-md px-4 py-2 text-sm font-medium transition-colors hover:bg-muted"
+                        className="inline-flex h-10 items-center rounded-md px-4 py-2 text-sm font-medium hover:bg-muted"
                       >
                         {item.title}
                       </Link>
                     </NavigationMenuLink>
                   </NavigationMenuItem>
                 ))}
+
+                {!isPending &&
+                  user &&
+                  dashboardMenu.map((item) => (
+                    <NavigationMenuItem key={item.title}>
+                      <NavigationMenuLink asChild>
+                        <Link
+                          href={item.url}
+                          className="inline-flex h-10 items-center rounded-md px-4 py-2 text-sm font-medium hover:bg-muted"
+                        >
+                          {item.title}
+                        </Link>
+                      </NavigationMenuLink>
+                    </NavigationMenuItem>
+                  ))}
               </NavigationMenuList>
             </NavigationMenu>
           </div>
@@ -95,7 +139,7 @@ const Navbar = ({ className }: NavbarProps) => {
                   <Link href="/login">Login</Link>
                 </Button>
                 <Button asChild size="sm">
-                  <Link href="/signup">Sign up</Link>
+                  <Link href="/register">Sign up</Link>
                 </Button>
               </>
             )}
@@ -140,7 +184,7 @@ const Navbar = ({ className }: NavbarProps) => {
 
                 <div className="flex flex-col gap-6 p-4">
                   <Accordion type="single" collapsible>
-                    {menu.map((item) => (
+                    {publicMenu.map((item) => (
                       <Link
                         key={item.title}
                         href={item.url}
@@ -149,6 +193,18 @@ const Navbar = ({ className }: NavbarProps) => {
                         {item.title}
                       </Link>
                     ))}
+
+                    {!isPending &&
+                      user &&
+                      dashboardMenu.map((item) => (
+                        <Link
+                          key={item.title}
+                          href={item.url}
+                          className="text-md font-semibold"
+                        >
+                          {item.title}
+                        </Link>
+                      ))}
                   </Accordion>
 
                   <div className="flex flex-col gap-3">
@@ -160,7 +216,7 @@ const Navbar = ({ className }: NavbarProps) => {
                           <Link href="/login">Login</Link>
                         </Button>
                         <Button asChild>
-                          <Link href="/signup">Sign up</Link>
+                          <Link href="/register">Sign up</Link>
                         </Button>
                       </>
                     )}
