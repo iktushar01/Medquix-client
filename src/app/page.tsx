@@ -15,8 +15,6 @@ export default async function Home() {
   })
   console.log(await res.json())
 
-  const session = await res.json()
-  console.log(session)
   return (
     <div>
       
