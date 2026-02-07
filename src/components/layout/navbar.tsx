@@ -6,6 +6,8 @@ import Link from "next/link";
 import { Menu } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import { authClient } from "@/lib/auth-client";
+import { useSession } from "@/lib/useSession";
 
 import { Accordion } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
@@ -41,6 +43,13 @@ const menu: MenuItem[] = [
 ];
 
 const Navbar = ({ className }: NavbarProps) => {
+  const { data, isPending } = useSession();
+  const user = data?.user;
+
+  const handleLogout = async () => {
+    await authClient.signOut();
+  };
+
   return (
     <section className={cn("py-4 border-b", className)}>
       <div className="container mx-auto">
@@ -53,7 +62,7 @@ const Navbar = ({ className }: NavbarProps) => {
                 src="https://i.postimg.cc/Bv1xhwD0/logo.png"
                 alt="MediStore Logo"
                 width={80}
-                height={10}
+                height={20}
                 priority
               />
             </Link>
@@ -65,7 +74,7 @@ const Navbar = ({ className }: NavbarProps) => {
                     <NavigationMenuLink asChild>
                       <Link
                         href={item.url}
-                        className="group inline-flex h-10 items-center rounded-md px-4 py-2 text-sm font-medium transition-colors hover:bg-muted"
+                        className="inline-flex h-10 items-center rounded-md px-4 py-2 text-sm font-medium transition-colors hover:bg-muted"
                       >
                         {item.title}
                       </Link>
@@ -79,12 +88,28 @@ const Navbar = ({ className }: NavbarProps) => {
           {/* Right */}
           <div className="flex items-center gap-2">
             <ModeToggle />
-            <Button asChild variant="outline" size="sm">
-              <Link href="/login">Login</Link>
-            </Button>
-            <Button asChild size="sm">
-              <Link href="/signup">Sign up</Link>
-            </Button>
+
+            {!isPending && !user && (
+              <>
+                <Button asChild variant="outline" size="sm">
+                  <Link href="/login">Login</Link>
+                </Button>
+                <Button asChild size="sm">
+                  <Link href="/signup">Sign up</Link>
+                </Button>
+              </>
+            )}
+
+            {!isPending && user && (
+              <>
+                <Button asChild variant="outline" size="sm">
+                  <Link href="/profile">Profile</Link>
+                </Button>
+                <Button size="sm" onClick={handleLogout}>
+                  Logout
+                </Button>
+              </>
+            )}
           </div>
         </nav>
 
@@ -96,7 +121,7 @@ const Navbar = ({ className }: NavbarProps) => {
                 src="https://i.postimg.cc/Bv1xhwD0/logo.png"
                 alt="MediStore Logo"
                 width={60}
-                height={150}
+                height={20}
                 priority
               />
             </Link>
@@ -114,11 +139,7 @@ const Navbar = ({ className }: NavbarProps) => {
                 </SheetHeader>
 
                 <div className="flex flex-col gap-6 p-4">
-                  <Accordion
-                    type="single"
-                    collapsible
-                    className="flex flex-col gap-4"
-                  >
+                  <Accordion type="single" collapsible>
                     {menu.map((item) => (
                       <Link
                         key={item.title}
@@ -132,12 +153,26 @@ const Navbar = ({ className }: NavbarProps) => {
 
                   <div className="flex flex-col gap-3">
                     <ModeToggle />
-                    <Button asChild variant="outline">
-                      <Link href="/login">Login</Link>
-                    </Button>
-                    <Button asChild>
-                      <Link href="/signup">Sign up</Link>
-                    </Button>
+
+                    {!isPending && !user && (
+                      <>
+                        <Button asChild variant="outline">
+                          <Link href="/login">Login</Link>
+                        </Button>
+                        <Button asChild>
+                          <Link href="/signup">Sign up</Link>
+                        </Button>
+                      </>
+                    )}
+
+                    {!isPending && user && (
+                      <>
+                        <Button asChild variant="outline">
+                          <Link href="/profile">Profile</Link>
+                        </Button>
+                        <Button onClick={handleLogout}>Logout</Button>
+                      </>
+                    )}
                   </div>
                 </div>
               </SheetContent>
