@@ -1,10 +1,9 @@
-import { Button } from "@/components/ui/button";
+import HeroSlider from "@/components/home/Hero";
 
 export default function Home() {
   return (
     <div>
-      <h1>Welcome to My Next.js App</h1>
-      <Button >Click Me</Button>
+      <HeroSlider />
     </div>
   );
 }
