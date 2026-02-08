@@ -24,7 +24,7 @@ export function SignupForm({
           <p className="text-muted-foreground text-sm text-balance">
             Fill in the form below to create your account
           </p>
-        </div>
+        </div> 
         <Field>
           <FieldLabel htmlFor="name">Full Name</FieldLabel>
           <Input id="name" type="text" placeholder="John Doe" required />
