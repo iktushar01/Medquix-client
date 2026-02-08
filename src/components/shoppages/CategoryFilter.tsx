@@ -8,11 +8,19 @@ interface CategoryFilterProps {
   onSelect: (id: number | null) => void;
 }
 
-export const CategoryFilter = ({ categories, selectedCategory, onSelect }: CategoryFilterProps) => {
+export const CategoryFilter = ({
+  categories,
+  selectedCategory,
+  onSelect,
+}: CategoryFilterProps) => {
   return (
     <div className="flex gap-3 overflow-x-auto py-2">
       <button
-        className={`px-3 py-1 rounded ${selectedCategory === null ? "bg-blue-500 text-white" : "bg-gray-200"}`}
+        className={`px-4 py-2 rounded-lg font-semibold ${
+          selectedCategory === null
+            ? "bg-primary text-primary-foreground"
+            : "bg-muted text-muted-foreground"
+        }`}
         onClick={() => onSelect(null)}
       >
         All
@@ -20,7 +28,11 @@ export const CategoryFilter = ({ categories, selectedCategory, onSelect }: Categ
       {categories.map((cat) => (
         <button
           key={cat.id}
-          className={`px-3 py-1 rounded ${selectedCategory === cat.id ? "bg-blue-500 text-white" : "bg-gray-200"}`}
+          className={`px-4 py-2 rounded-lg font-semibold ${
+            selectedCategory === cat.id
+              ? "bg-primary text-primary-foreground"
+              : "bg-muted text-muted-foreground"
+          }`}
           onClick={() => onSelect(cat.id)}
         >
           {cat.name}
