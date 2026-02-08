@@ -1,20 +1,10 @@
 import HeroSlider from "@/components/modules/home/Hero";
-import { authClient } from "@/lib/auth-client";
-import { cookies } from "next/headers";
+import { userService } from "@/services/user.service";
 
 export default async function Home() {
-  const section = await authClient.getSession() 
-  console.log(section)
-  const cookieStore = await cookies();
-  console.log(cookieStore)
-  const res = await fetch("http://localhost:5000/api/auth/get-session", {
-    headers: {
-      cookie: cookieStore.toString()
-    },
-    cache: "no-store",
-  })
-  console.log(await res.json())
 
+const {data} = await userService.getSession();
+console.log(data)
   return (
     <div>
       <HeroSlider />
