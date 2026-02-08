@@ -1,4 +1,4 @@
-import HeroSlider from "@/components/home/Hero";
+import HeroSlider from "@/components/modules/home/Hero";
 import { authClient } from "@/lib/auth-client";
 import { cookies } from "next/headers";
 
@@ -17,7 +17,6 @@ export default async function Home() {
 
   return (
     <div>
-      
       <HeroSlider />
     </div>
   );

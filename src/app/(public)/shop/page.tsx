@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import { MedicineCard } from "@/components/shoppages/MedicineCard";
-import { CategoryFilter } from "@/components/shoppages/CategoryFilter";
+import { MedicineCard } from "@/components/modules/shoppages/MedicineCard";
+import { CategoryFilter } from "@/components/modules/shoppages/CategoryFilter";
 import { useMedicines } from "@/hooks/useMedicines";
 import { useQuery } from "@tanstack/react-query";
 import api from "@/lib/axios";

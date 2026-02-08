@@ -2,6 +2,7 @@
 
 import React from "react";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 
 interface MedicineProps {
   id: number;
@@ -40,9 +41,11 @@ export const MedicineCard = ({ medicine }: { medicine: MedicineProps }) => {
       <p className="mt-1">
         <span className="font-semibold">Category:</span> {medicine.category.name}
       </p>
-      <button className="mt-3 w-full bg-primary text-primary-foreground rounded-md py-2 hover:bg-primary/90 transition">
-        Add to Cart
-      </button>
+      <Link href={`/shop/${medicine.id}`}>
+        <button className="mt-3 w-full bg-primary text-primary-foreground rounded-md py-2 hover:bg-primary/90 transition cursor-pointer">
+          details
+        </button>
+      </Link>
     </div>
   );
 };
