@@ -51,16 +51,16 @@ const publicMenu: MenuItem[] = [
 
 /* -------------------- Role Based Menu -------------------- */
 const roleMenus: Record<string, MenuItem[]> = {
-  USER: [
+  user: [
     { title: "Cart", url: "/cart" },
     { title: "My Orders", url: "/orders" },
   ],
-  SELLER: [
+  seller: [
     { title: "Dashboard", url: "/seller/dashboard" },
     { title: "Medicines", url: "/seller/medicines" },
     { title: "Orders", url: "/seller/orders" },
   ],
-  ADMIN: [
+  admin: [
     { title: "Dashboard", url: "/admin" },
     { title: "Users", url: "/admin/users" },
     { title: "Orders", url: "/admin/orders" },
@@ -139,7 +139,7 @@ const Navbar = ({ className }: NavbarProps) => {
                   <Link href="/login">Login</Link>
                 </Button>
                 <Button asChild size="sm">
-                  <Link href="/register">Sign up</Link>
+                  <Link href="/signup">Sign up</Link>
                 </Button>
               </>
             )}
@@ -216,7 +216,7 @@ const Navbar = ({ className }: NavbarProps) => {
                           <Link href="/login">Login</Link>
                         </Button>
                         <Button asChild>
-                          <Link href="/register">Sign up</Link>
+                          <Link href="/signup">Sign up</Link>
                         </Button>
                       </>
                     )}
