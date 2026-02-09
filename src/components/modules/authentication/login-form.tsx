@@ -21,19 +21,15 @@ export function LoginForm({
 }: React.ComponentProps<"form">) {
   const router = useRouter();
   const searchParams = useSearchParams();
-
-  // 🔐 safe redirect (internal only)
-  const redirectTo =
-    searchParams.get("redirect")?.startsWith("/")
-      ? searchParams.get("redirect")!
-      : "/";
-
   const session = authClient.useSession();
 
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
+
+  // Get the callback URL from query params (e.g., /login?callbackUrl=/cart)
+  const callbackUrl = searchParams.get("callbackUrl");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,8 +60,31 @@ export function LoginForm({
 
       console.log("Login success:", data);
 
-      // ✅ redirect to desired page
-      router.push(redirectTo);
+      // Refetch session data to get updated user info
+      await session.refetch();
+
+      // Determine redirect URL based on callback or user role
+      let redirectUrl = "/";
+
+      if (callbackUrl) {
+        // If there's a callback URL, redirect there
+        redirectUrl = callbackUrl;
+      } else if (data.user?.role) {
+        // Otherwise, redirect based on user role
+        const role = data.user.role.toLowerCase();
+        if (role === "seller") {
+          redirectUrl = "/seller/dashboard";
+        } else if (role === "admin") {
+          redirectUrl = "/admin";
+        } else {
+          // Default to home for regular users
+          redirectUrl = "/";
+        }
+      }
+
+      // Navigate to the determined URL
+      router.push(redirectUrl);
+      router.refresh(); // Refresh to update server components
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -134,7 +153,7 @@ export function LoginForm({
 
         <Field>
           <Button
-            onClick={() => handleGoogleLogin(redirectTo)}
+            onClick={handleGoogleLogin}
             variant="outline"
             type="button"
           >
