@@ -26,40 +26,53 @@ export default function Page() {
   const router = useRouter();
 
   // 🔹 Fetch medicines
-  useEffect(() => {
-    const fetchMedicines = async () => {
-      try {
-        const res = await fetch("http://localhost:5000/api/medicines", {
-          cache: "no-store",
-        });
-        const json = await res.json();
-        setMedicines(json.data || []);
-      } catch (error) {
-        console.error("Failed to fetch medicines", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchMedicines();
-  }, []);
-
-  // 🔹 Delete medicine
-  const handleDelete = async (id: number) => {
-    const confirmDelete = confirm("Are you sure you want to delete this medicine?");
-    if (!confirmDelete) return;
-
+useEffect(() => {
+  const fetchMedicines = async () => {
     try {
-      await fetch(`http://localhost:5000/api/medicines/${id}`, {
-        method: "DELETE",
-      });
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/medicines`,
+        {
+          cache: "no-store",
+        }
+      );
 
-      // update UI instantly
-      setMedicines((prev) => prev.filter((m) => m.id !== id));
+      const json = await res.json();
+      setMedicines(json.data || []);
     } catch (error) {
-      console.error("Delete failed", error);
+      console.error("Failed to fetch medicines", error);
+    } finally {
+      setLoading(false);
     }
   };
+
+  fetchMedicines();
+}, []);
+
+  // 🔹 Delete medicine
+ const handleDelete = async (id: number) => {
+  const confirmDelete = confirm("Are you sure you want to delete this medicine?");
+  if (!confirmDelete) return;
+
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/medicines/${id}`,
+      {
+        method: "DELETE",
+      }
+    );
+
+    if (!res.ok) {
+      throw new Error("Failed to delete medicine");
+    }
+
+    // old-school reliable optimistic update
+    setMedicines((prev) => prev.filter((m) => m.id !== id));
+  } catch (error) {
+    console.error("Delete failed", error);
+    alert("Something went wrong while deleting");
+  }
+};
+
 
   if (loading) {
     return (
@@ -85,7 +98,7 @@ export default function Page() {
           </p>
         </div>
         <button
-          onClick={() => router.push("/medicines/add")}
+          onClick={() => router.push("/seller/medicines/add")}
           className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-colors"
         >
           <Plus className="h-4 w-4" />
