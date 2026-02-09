@@ -30,6 +30,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
+import { ModeToggle } from "@/components/ui/modeToggle";
 
 /* -------------------- Helper Functions -------------------- */
 const generateBreadcrumbs = (pathname: string) => {
@@ -117,6 +118,8 @@ export default function DashboardLayout({
                 className="pl-8 w-[200px] lg:w-[300px]"
               />
             </div>
+
+            <ModeToggle />
 
             {/* Notifications */}
             <DropdownMenu>
