@@ -26,52 +26,52 @@ export default function Page() {
   const router = useRouter();
 
   // 🔹 Fetch medicines
-useEffect(() => {
-  const fetchMedicines = async () => {
+  useEffect(() => {
+    const fetchMedicines = async () => {
+      try {
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/medicines`,
+          {
+            cache: "no-store",
+          }
+        );
+
+        const json = await res.json();
+        setMedicines(json.data || []);
+      } catch (error) {
+        console.error("Failed to fetch medicines", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMedicines();
+  }, []);
+
+  // 🔹 Delete medicine
+  const handleDelete = async (id: number) => {
+    const confirmDelete = confirm("Are you sure you want to delete this medicine?");
+    if (!confirmDelete) return;
+
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/medicines`,
+        `${process.env.NEXT_PUBLIC_API_URL}/medicines/${id}`,
         {
-          cache: "no-store",
+          method: "DELETE",
         }
       );
 
-      const json = await res.json();
-      setMedicines(json.data || []);
+      if (!res.ok) {
+        throw new Error("Failed to delete medicine");
+      }
+
+      // old-school reliable optimistic update
+      setMedicines((prev) => prev.filter((m) => m.id !== id));
     } catch (error) {
-      console.error("Failed to fetch medicines", error);
-    } finally {
-      setLoading(false);
+      console.error("Delete failed", error);
+      alert("Something went wrong while deleting");
     }
   };
-
-  fetchMedicines();
-}, []);
-
-  // 🔹 Delete medicine
- const handleDelete = async (id: number) => {
-  const confirmDelete = confirm("Are you sure you want to delete this medicine?");
-  if (!confirmDelete) return;
-
-  try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/medicines/${id}`,
-      {
-        method: "DELETE",
-      }
-    );
-
-    if (!res.ok) {
-      throw new Error("Failed to delete medicine");
-    }
-
-    // old-school reliable optimistic update
-    setMedicines((prev) => prev.filter((m) => m.id !== id));
-  } catch (error) {
-    console.error("Delete failed", error);
-    alert("Something went wrong while deleting");
-  }
-};
 
 
   if (loading) {
@@ -174,13 +174,12 @@ useEffect(() => {
 
                   <td className="p-4 align-middle">
                     <span
-                      className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ${
-                        medicine.stock > 10
+                      className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ${medicine.stock > 10
                           ? "bg-primary/10 text-primary"
                           : medicine.stock > 0
-                          ? "bg-amber-500/10 text-amber-600 dark:text-amber-500"
-                          : "bg-destructive/10 text-destructive"
-                      }`}
+                            ? "bg-amber-500/10 text-amber-600 dark:text-amber-500"
+                            : "bg-destructive/10 text-destructive"
+                        }`}
                     >
                       {medicine.stock} units
                     </span>
@@ -201,7 +200,7 @@ useEffect(() => {
                   <td className="p-4 align-middle">
                     <div className="flex items-center justify-center gap-2">
                       <button
-                        onClick={() => router.push(`/medicines/${medicine.id}`)}
+                        onClick={() => router.push(`/seller/medicines/${medicine.id}`)}
                         className="inline-flex items-center justify-center rounded-md h-8 w-8 border border-border bg-background hover:bg-accent hover:text-accent-foreground transition-colors"
                         title="View Details"
                       >
@@ -209,7 +208,7 @@ useEffect(() => {
                       </button>
 
                       <button
-                        onClick={() => router.push(`/medicines/edit/${medicine.id}`)}
+                        onClick={() => router.push(`/seller/medicines/edit/${medicine.id}`)}
                         className="inline-flex items-center justify-center rounded-md h-8 w-8 border border-border bg-background hover:bg-accent hover:text-accent-foreground transition-colors"
                         title="Edit"
                       >
