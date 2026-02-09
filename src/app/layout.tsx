@@ -37,7 +37,6 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <QueryProvider>
-            <Navbar />
             {children}
           </QueryProvider>
         </ThemeProvider>
