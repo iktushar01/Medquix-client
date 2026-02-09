@@ -11,53 +11,185 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { handleGoogleLogin } from "@/lib/handleGoogleLogin";
-import { useState } from "react";
+import { useState, useCallback, useMemo } from "react";
+import { uploadToImgbb } from "@/lib/uploadToImgbb";
+
+interface FormData {
+  name: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+  phone: string;
+  image: string;
+}
+
+interface FormErrors {
+  password?: string;
+  confirmPassword?: string;
+  phone?: string;
+  general?: string;
+}
 
 export function SignupForm({ className, ...props }: React.ComponentProps<"form">) {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [phone, setPhone] = useState("");
-  const [image, setImage] = useState(""); // URL string
+  const [formData, setFormData] = useState<FormData>({
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    phone: "",
+    image: "",
+  });
+  
+  const [errors, setErrors] = useState<FormErrors>({});
   const [loading, setLoading] = useState(false);
+  const [imageUploading, setImageUploading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // Memoized validation
+  const passwordsMatch = useMemo(
+    () => !formData.confirmPassword || formData.password === formData.confirmPassword,
+    [formData.password, formData.confirmPassword]
+  );
 
-    if (password !== confirmPassword) {
-      alert("Passwords do not match");
-      return;
+  const isFormValid = useMemo(() => {
+    return (
+      formData.name.trim() &&
+      formData.email.trim() &&
+      formData.password.length >= 6 &&
+      passwordsMatch &&
+      formData.phone.trim()
+    );
+  }, [formData, passwordsMatch]);
+
+  // Generic input handler
+  const handleInputChange = useCallback(
+    (field: keyof FormData) => (e: React.ChangeEvent<HTMLInputElement>) => {
+      setFormData((prev) => ({ ...prev, [field]: e.target.value }));
+      // Clear related errors
+      if (errors[field as keyof FormErrors]) {
+        setErrors((prev) => ({ ...prev, [field]: undefined }));
+      }
+    },
+    [errors]
+  );
+
+  // Validate password strength
+  const validatePassword = useCallback((password: string): string | undefined => {
+    if (password.length < 6) {
+      return "Password must be at least 6 characters";
     }
+    if (!/[A-Z]/.test(password)) {
+      return "Password should contain at least one uppercase letter";
+    }
+    if (!/[0-9]/.test(password)) {
+      return "Password should contain at least one number";
+    }
+    return undefined;
+  }, []);
 
-    setLoading(true);
+  // Validate phone number
+  const validatePhone = useCallback((phone: string): string | undefined => {
+    const phoneRegex = /^01[3-9]\d{8}$/; // Bangladesh phone format
+    if (!phoneRegex.test(phone)) {
+      return "Please enter a valid phone number (e.g., 017xxxxxxxx)";
+    }
+    return undefined;
+  }, []);
 
-    try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/sign-up/email`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include", // if using cookie-based auth
-        body: JSON.stringify({ name, email, password, phone, image }),
-      });
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault();
 
-      if (!res.ok) {
-        const data = await res.json();
-        alert(data.message || "Signup failed");
-        setLoading(false);
+      // Reset errors
+      setErrors({});
+
+      // Validate passwords match
+      if (!passwordsMatch) {
+        setErrors({ confirmPassword: "Passwords do not match" });
         return;
       }
 
-      alert("Account created successfully!");
-      window.location.href = "/login";
-    } catch (err) {
-      console.error(err);
-      alert("Network error");
-    } finally {
-      setLoading(false);
-    }
-  };
+      // Validate password strength
+      const passwordError = validatePassword(formData.password);
+      if (passwordError) {
+        setErrors({ password: passwordError });
+        return;
+      }
+
+      // Validate phone
+      const phoneError = validatePhone(formData.phone);
+      if (phoneError) {
+        setErrors({ phone: phoneError });
+        return;
+      }
+
+      setLoading(true);
+
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/sign-up/email`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({
+            name: formData.name.trim(),
+            email: formData.email.trim().toLowerCase(),
+            password: formData.password,
+            phone: formData.phone.trim(),
+            image: formData.image,
+          }),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          setErrors({ general: data.message || "Signup failed. Please try again." });
+          return;
+        }
+
+        // Success - redirect
+        window.location.href = "/login";
+      } catch (err) {
+        console.error("Signup error:", err);
+        setErrors({ general: "Network error. Please check your connection." });
+      } finally {
+        setLoading(false);
+      }
+    },
+    [formData, passwordsMatch, validatePassword, validatePhone]
+  );
+
+  const handleImageChange = useCallback(
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        setErrors({ general: "Image size must be less than 5MB" });
+        return;
+      }
+
+      // Validate file type
+      if (!file.type.startsWith("image/")) {
+        setErrors({ general: "Please upload a valid image file" });
+        return;
+      }
+
+      try {
+        setImageUploading(true);
+        const url = await uploadToImgbb(file);
+        setFormData((prev) => ({ ...prev, image: url }));
+        setErrors((prev) => ({ ...prev, general: undefined }));
+      } catch (err) {
+        console.error("Image upload error:", err);
+        setErrors({ general: "Image upload failed. Please try again." });
+      } finally {
+        setImageUploading(false);
+      }
+    },
+    []
+  );
+
+  const isSubmitDisabled = loading || imageUploading || !isFormValid;
 
   return (
     <form className={cn("flex flex-col gap-6", className)} onSubmit={handleSubmit} {...props}>
@@ -69,6 +201,31 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"form">
           </p>
         </div>
 
+        {/* Display general errors */}
+        {errors.general && (
+          <div className="bg-destructive/10 text-destructive rounded-md p-3 text-sm">
+            {errors.general}
+          </div>
+        )}
+
+        {/* Profile Image Upload */}
+        <Field>
+          <FieldLabel>Profile Image</FieldLabel>
+          <Input
+            type="file"
+            accept="image/*"
+            onChange={handleImageChange}
+            disabled={imageUploading || loading}
+          />
+          <FieldDescription>
+            {imageUploading
+              ? "Uploading image..."
+              : formData.image
+              ? "Image uploaded successfully ✓"
+              : "Optional: Upload a profile picture (max 5MB)"}
+          </FieldDescription>
+        </Field>
+
         <Field>
           <FieldLabel htmlFor="name">Full Name</FieldLabel>
           <Input
@@ -76,8 +233,9 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"form">
             type="text"
             placeholder="John Doe"
             required
-            value={name}
-            onChange={(e) => setName(e.target.value)}
+            value={formData.name}
+            onChange={handleInputChange("name")}
+            disabled={loading}
           />
         </Field>
 
@@ -88,8 +246,10 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"form">
             type="email"
             placeholder="m@example.com"
             required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            value={formData.email}
+            onChange={handleInputChange("email")}
+            disabled={loading}
+            autoComplete="email"
           />
         </Field>
 
@@ -99,9 +259,22 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"form">
             id="password"
             type="password"
             required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            value={formData.password}
+            onChange={handleInputChange("password")}
+            disabled={loading}
+            autoComplete="new-password"
+            aria-invalid={!!errors.password}
           />
+          {errors.password && (
+            <FieldDescription className="text-destructive">
+              {errors.password}
+            </FieldDescription>
+          )}
+          {!errors.password && formData.password && (
+            <FieldDescription>
+              Password strength: {formData.password.length < 6 ? "Weak" : "Good"}
+            </FieldDescription>
+          )}
         </Field>
 
         <Field>
@@ -110,37 +283,46 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"form">
             id="confirm-password"
             type="password"
             required
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
+            value={formData.confirmPassword}
+            onChange={handleInputChange("confirmPassword")}
+            disabled={loading}
+            autoComplete="new-password"
+            aria-invalid={!!errors.confirmPassword}
           />
+          {errors.confirmPassword && (
+            <FieldDescription className="text-destructive">
+              {errors.confirmPassword}
+            </FieldDescription>
+          )}
+          {!errors.confirmPassword && formData.confirmPassword && passwordsMatch && (
+            <FieldDescription className="text-green-600">
+              Passwords match ✓
+            </FieldDescription>
+          )}
         </Field>
 
         <Field>
           <FieldLabel htmlFor="phone">Phone</FieldLabel>
           <Input
             id="phone"
-            type="text"
+            type="tel"
             placeholder="017xxxxxxxx"
             required
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
+            value={formData.phone}
+            onChange={handleInputChange("phone")}
+            disabled={loading}
+            autoComplete="tel"
+            aria-invalid={!!errors.phone}
           />
+          {errors.phone && (
+            <FieldDescription className="text-destructive">
+              {errors.phone}
+            </FieldDescription>
+          )}
         </Field>
 
         <Field>
-          <FieldLabel htmlFor="image">Profile Image URL</FieldLabel>
-          <Input
-            id="image"
-            type="text"
-            placeholder="https://example.com/image.png"
-            value={image}
-            onChange={(e) => setImage(e.target.value)}
-          />
-          <FieldDescription>Optional: Provide a URL for your profile image</FieldDescription>
-        </Field>
-
-        <Field>
-          <Button type="submit" disabled={loading}>
+          <Button type="submit" disabled={isSubmitDisabled} className="w-full">
             {loading ? "Creating..." : "Create Account"}
           </Button>
         </Field>
@@ -148,11 +330,20 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"form">
         <FieldSeparator>Or continue with</FieldSeparator>
 
         <Field>
-          <Button onClick={handleGoogleLogin} variant="outline" type="button">
+          <Button
+            onClick={handleGoogleLogin}
+            variant="outline"
+            type="button"
+            disabled={loading}
+            className="w-full"
+          >
             Login with Google
           </Button>
           <FieldDescription className="px-6 text-center">
-            Already have an account? <a href="/login">Sign in</a>
+            Already have an account?{" "}
+            <a href="/login" className="text-primary hover:underline">
+              Sign in
+            </a>
           </FieldDescription>
         </Field>
       </FieldGroup>

@@ -15,7 +15,7 @@ export default function SignupPage() {
       </div>
       <div className="bg-muted relative hidden lg:block">
         <img
-          src="/placeholder.svg"
+          src="https://i.postimg.cc/MHDSD6DL/Pngtree-assorted-pills-tablets-and-capsules-3708077.jpg"
           alt="Image"
           className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
         />
