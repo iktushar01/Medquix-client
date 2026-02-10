@@ -45,9 +45,7 @@ interface User {
 /* -------------------- Public Menu -------------------- */
 const publicMenu: MenuItem[] = [
   { title: "Home", url: "/" },
-  { title: "Shop", url: "/shop" },
-  { title: "Blog", url: "/blog" },
-  { title: "Contact", url: "/contact" },
+  { title: "Shop", url: "/shop" }
 ];
 
 /* -------------------- Role Based Menu -------------------- */
@@ -62,7 +60,7 @@ const roleMenus: Record<string, MenuItem[]> = {
     { title: "Orders", url: "/seller/orders" },
   ],
   admin: [
-    { title: "Dashboard", url: "/admin" },
+    { title: "Dashboard", url: "/admin/dashboard" },
     { title: "Users", url: "/admin/users" },
     { title: "Orders", url: "/admin/orders" },
     { title: "Categories", url: "/admin/categories" },
