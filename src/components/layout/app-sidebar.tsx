@@ -79,7 +79,7 @@ const roleMenus: Record<string, MenuItem[]> = {
   admin: [
     {
       title: "Dashboard",
-      url: "/admin",
+      url: "/admin/dashboard",
       icon: LayoutDashboard,
     },
     {
