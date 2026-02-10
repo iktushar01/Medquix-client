@@ -43,6 +43,23 @@ export default function CategoryManagement() {
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [editName, setEditName] = useState("");
 
+  // --- DARK MODE SWEETALERT HELPER ---
+  const themeSwal = () => {
+    const isDark = document.documentElement.classList.contains("dark");
+    return Swal.mixin({
+      customClass: {
+        popup: "rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-2xl bg-white dark:bg-slate-900",
+        title: "text-2xl font-black text-slate-900 dark:text-white",
+        htmlContainer: "text-slate-600 dark:text-slate-400",
+        confirmButton: "bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-8 rounded-xl transition-all mx-2 shadow-lg shadow-emerald-500/20",
+        cancelButton: "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold py-3 px-8 rounded-xl transition-all mx-2"
+      },
+      buttonsStyling: false,
+      background: isDark ? "#0f172a" : "#ffffff", 
+      color: isDark ? "#f8fafc" : "#0f172a",
+    });
+  };
+
   // 1. GET ALL CATEGORIES
   const { data: categories, isLoading } = useQuery<Category[]>({
     queryKey: ["categories"],
@@ -61,10 +78,11 @@ export default function CategoryManagement() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["categories"] });
       setIsEditOpen(false);
-      Swal.fire({ 
+      themeSwal().fire({ 
         title: "Success", 
         text: "Category updated successfully", 
         icon: "success", 
+        iconColor: "#10b981",
         toast: true, 
         position: "top-end", 
         timer: 2000, 
@@ -72,7 +90,12 @@ export default function CategoryManagement() {
       });
     },
     onError: (err: any) => {
-      Swal.fire("Error", err.response?.data?.message || "Failed to update", "error");
+      themeSwal().fire({
+        title: "Error",
+        text: err.response?.data?.message || "Failed to update",
+        icon: "error",
+        iconColor: "#ef4444",
+      });
     }
   });
 
@@ -83,7 +106,12 @@ export default function CategoryManagement() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["categories"] });
-      Swal.fire("Deleted!", "Category removed.", "success");
+      themeSwal().fire({
+        title: "Deleted!",
+        text: "Category removed successfully.",
+        icon: "success",
+        iconColor: "#10b981",
+      });
     }
   });
 
@@ -110,65 +138,78 @@ export default function CategoryManagement() {
     });
   };
 
+  const handleDelete = (id: number) => {
+    themeSwal().fire({
+      title: "Delete Category?",
+      text: "This action cannot be undone!",
+      icon: "warning",
+      iconColor: "#f59e0b",
+      showCancelButton: true,
+      confirmButtonText: "Yes, delete",
+      cancelButtonText: "Cancel",
+      reverseButtons: true
+    }).then(r => r.isConfirmed && deleteMutation.mutate(id));
+  };
+
   if (isLoading) return <Loading />;
 
   return (
-    <div className="p-6 lg:p-10 bg-slate-50/50 dark:bg-transparent min-h-screen">
+    <div className="p-6 lg:p-10 bg-slate-50/50 dark:bg-slate-950/50 min-h-screen transition-colors duration-300">
       
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
         <div>
-          <h1 className="text-3xl font-black tracking-tight flex items-center gap-3">
+          <h1 className="text-3xl font-black tracking-tight flex items-center gap-3 text-slate-900 dark:text-white">
             <Layers className="h-8 w-8 text-emerald-500" /> Category Lab
           </h1>
-          <p className="text-slate-500 mt-1">Refine and organize your MediStore inventory classification.</p>
+          <p className="text-slate-500 dark:text-slate-400 mt-1">Refine and organize your MediStore inventory classification.</p>
         </div>
         <Link href="/admin/categories/create">
-          <Button className="bg-emerald-600 hover:bg-emerald-700 rounded-xl h-12 px-6 gap-2 shadow-lg shadow-emerald-500/20 font-bold">
+          <Button className="bg-emerald-600 hover:bg-emerald-700 rounded-xl h-12 px-6 gap-2 shadow-lg shadow-emerald-500/20 font-bold transition-transform active:scale-95">
             <Plus className="h-5 w-5" /> Add New Category
           </Button>
         </Link>
       </div>
 
       {/* Table Section */}
-      <div className="bg-white dark:bg-slate-900 rounded-3xl border shadow-sm overflow-hidden">
+      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
         <Table>
           <TableHeader className="bg-slate-50/50 dark:bg-slate-800/50">
-            <TableRow>
-              <TableHead className="py-5 px-6">Category Info</TableHead>
-              <TableHead>Created Date</TableHead>
-              <TableHead>Visibility</TableHead>
-              <TableHead className="text-right px-6">Actions</TableHead>
+            <TableRow className="hover:bg-transparent">
+              <TableHead className="py-5 px-6 font-bold text-slate-900 dark:text-slate-100">Category Info</TableHead>
+              <TableHead className="font-bold text-slate-900 dark:text-slate-100">Created Date</TableHead>
+              <TableHead className="font-bold text-slate-900 dark:text-slate-100">Visibility</TableHead>
+              <TableHead className="text-right px-6 font-bold text-slate-900 dark:text-slate-100">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {categories?.map((category) => (
-              <TableRow key={category.id} className="group hover:bg-slate-50/30 dark:hover:bg-slate-800/30 transition-all border-b">
+              <TableRow key={category.id} className="group hover:bg-slate-50/30 dark:hover:bg-slate-800/30 transition-all border-b border-slate-100 dark:border-slate-800">
                 <TableCell className="py-5 px-6">
                   <div className="flex items-center gap-3">
                     <div className="h-10 w-10 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center font-bold">
                       {category.name.charAt(0).toUpperCase()}
                     </div>
                     <div>
-                      <span className="font-bold">{category.name}</span>
+                      <span className="font-bold text-slate-900 dark:text-slate-100">{category.name}</span>
                       <span className="text-[10px] text-slate-400 block font-mono">ID: #{category.id}</span>
                     </div>
                   </div>
                 </TableCell>
                 
                 <TableCell>
-                  <div className="flex items-center gap-2 text-slate-500 text-sm">
+                  <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 text-sm">
                     <Calendar className="h-4 w-4" />
                     {new Date(category.createdAt).toLocaleDateString()}
                   </div>
                 </TableCell>
                 
                 <TableCell>
-                  <button onClick={() => toggleStatus(category)}>
-                    <Badge className={`rounded-full px-3 py-1 cursor-pointer transition-all ${
+                  <button onClick={() => toggleStatus(category)} className="transition-transform active:scale-90">
+                    <Badge className={`rounded-full px-3 py-1 cursor-pointer transition-all border-none ${
                       category.isActive 
-                      ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40" 
-                      : "bg-slate-100 text-slate-500"
+                      ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400" 
+                      : "bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400"
                     }`}>
                       {category.isActive ? "Active" : "Hidden"}
                     </Badge>
@@ -181,7 +222,7 @@ export default function CategoryManagement() {
                       variant="outline" 
                       size="sm" 
                       onClick={() => openEditModal(category)}
-                      className="h-9 w-9 p-0 rounded-lg hover:bg-emerald-50 hover:text-emerald-600"
+                      className="h-9 w-9 p-0 rounded-lg border-slate-200 dark:border-slate-700 hover:bg-emerald-500 hover:text-white transition-colors"
                     >
                       <Pencil className="h-4 w-4" />
                     </Button>
@@ -189,15 +230,8 @@ export default function CategoryManagement() {
                     <Button 
                       variant="outline" 
                       size="sm" 
-                      onClick={() => {
-                        Swal.fire({
-                          title: "Delete Category?",
-                          icon: "warning",
-                          showCancelButton: true,
-                          confirmButtonText: "Yes, delete"
-                        }).then(r => r.isConfirmed && deleteMutation.mutate(category.id))
-                      }}
-                      className="h-9 w-9 p-0 rounded-lg hover:bg-red-50 hover:text-red-600 hover:border-red-200"
+                      onClick={() => handleDelete(category.id)}
+                      className="h-9 w-9 p-0 rounded-lg border-slate-200 dark:border-slate-700 hover:bg-red-500 hover:text-white transition-colors"
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
@@ -211,14 +245,14 @@ export default function CategoryManagement() {
 
       {/* --- EDIT MODAL --- */}
       <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-        <DialogContent className="sm:max-w-[425px] rounded-3xl p-0 overflow-hidden border-none">
+        <DialogContent className="sm:max-w-[425px] rounded-3xl p-0 overflow-hidden border-none shadow-2xl bg-white dark:bg-slate-900">
           <DialogHeader className="p-6 bg-emerald-600 text-white">
             <DialogTitle className="text-2xl font-bold flex items-center gap-2">
               <Pencil className="h-5 w-5" /> Edit Category
             </DialogTitle>
           </DialogHeader>
           
-          <form onSubmit={handleUpdate} className="p-6 space-y-6 bg-white dark:bg-slate-900">
+          <form onSubmit={handleUpdate} className="p-6 space-y-6">
             <div className="space-y-2">
               <label className="text-sm font-bold text-slate-500 dark:text-slate-400 ml-1">
                 Category Name
@@ -227,7 +261,7 @@ export default function CategoryManagement() {
                 value={editName}
                 onChange={(e) => setEditName(e.target.value)}
                 placeholder="Enter category name..."
-                className="h-12 bg-slate-50 dark:bg-slate-800 border-none rounded-xl focus-visible:ring-emerald-500"
+                className="h-12 bg-slate-50 dark:bg-slate-800 border-none rounded-xl focus-visible:ring-emerald-500 dark:text-white shadow-inner"
                 required
               />
             </div>
@@ -237,14 +271,14 @@ export default function CategoryManagement() {
                 type="button" 
                 variant="ghost" 
                 onClick={() => setIsEditOpen(false)}
-                className="flex-1 h-12 rounded-xl gap-2 font-bold"
+                className="flex-1 h-12 rounded-xl gap-2 font-bold dark:text-slate-300"
               >
                 <X className="h-4 w-4" /> Cancel
               </Button>
               <Button 
                 type="submit" 
                 disabled={updateMutation.isPending}
-                className="flex-1 h-12 rounded-xl bg-emerald-600 hover:bg-emerald-700 gap-2 font-bold shadow-lg shadow-emerald-500/20"
+                className="flex-1 h-12 rounded-xl bg-emerald-600 hover:bg-emerald-700 gap-2 font-bold shadow-lg shadow-emerald-500/20 text-white"
               >
                 {updateMutation.isPending ? "Updating..." : <><Save className="h-4 w-4" /> Save Changes</>}
               </Button>
