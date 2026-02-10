@@ -1,6 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import api from "@/lib/axios";
 
+export interface MedicineImage {
+    id: number;
+    imageUrl: string;
+    medicineId: number;
+}
+
 export interface Medicine {
     id: number;
     name: string;
@@ -14,6 +20,7 @@ export interface Medicine {
         id: number;
         name: string;
     };
+    images: MedicineImage[];
 }
 
 export const useMedicines = (categoryId?: number | null) => {

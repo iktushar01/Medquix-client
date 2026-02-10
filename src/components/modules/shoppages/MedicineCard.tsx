@@ -1,8 +1,10 @@
 "use client";
 
 import React from "react";
-import { cn } from "@/lib/utils";
 import Link from "next/link";
+import Image from "next/image";
+import { cn } from "@/lib/utils";
+import { ShoppingCart, ArrowRight } from "lucide-react"; // Optional: if you use lucide
 
 interface MedicineProps {
   id: number;
@@ -10,42 +12,60 @@ interface MedicineProps {
   description: string;
   price: string;
   stock: number;
-  manufacturer: string;
-  expiryDate: string;
   category: { name: string };
+  images: { imageUrl: string }[];
 }
 
 export const MedicineCard = ({ medicine }: { medicine: MedicineProps }) => {
+  const imageUrl = medicine.images?.[0]?.imageUrl || "/placeholder-medicine.png";
+
   return (
-    <div
-      className={cn(
-        "border border-border rounded-xl p-5 bg-card text-card-foreground shadow hover:shadow-lg transition-all duration-300"
-      )}
-    >
-      <h2 className="text-xl font-bold text-primary-foreground">{medicine.name}</h2>
-      <p className="text-muted-foreground mt-1">{medicine.description}</p>
-      <p className="mt-2">
-        <span className="font-semibold">Price:</span>{" "}
-        <span className="text-secondary">${medicine.price}</span>
-      </p>
-      <p>
-        <span className="font-semibold">Stock:</span> {medicine.stock}
-      </p>
-      <p>
-        <span className="font-semibold">Manufacturer:</span> {medicine.manufacturer}
-      </p>
-      <p>
-        <span className="font-semibold">Expiry:</span>{" "}
-        {new Date(medicine.expiryDate).toLocaleDateString()}
-      </p>
-      <p className="mt-1">
-        <span className="font-semibold">Category:</span> {medicine.category.name}
-      </p>
-      <Link href={`/shop/${medicine.id}`}>
-        <button className="mt-3 w-full bg-primary text-primary-foreground rounded-md py-2 hover:bg-primary/90 transition cursor-pointer">
-          details
-        </button>
+    <div className="group relative flex flex-col overflow-hidden rounded-xl border border-border bg-card transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+      {/* IMAGE CONTAINER */}
+      <Link href={`/shop/${medicine.id}`} className="relative aspect-square overflow-hidden bg-muted">
+        <Image
+          src={imageUrl}
+          alt={medicine.name}
+          fill
+          className="object-cover transition-transform duration-500 group-hover:scale-105"
+        />
+        {/* Category Badge */}
+        <div className="absolute top-3 left-3">
+          <span className="rounded-full bg-background/80 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider backdrop-blur-md">
+            {medicine.category.name}
+          </span>
+        </div>
       </Link>
+
+      {/* CONTENT */}
+      <div className="flex flex-1 flex-col p-4">
+        <div className="flex items-start justify-between gap-2">
+          <div>
+            <Link href={`/shop/${medicine.id}`}>
+              <h3 className="line-clamp-1 font-semibold text-foreground transition-colors hover:text-primary">
+                {medicine.name}
+              </h3>
+            </Link>
+            <p className="line-clamp-1 text-xs text-muted-foreground">
+              {medicine.stock > 0 ? `${medicine.stock} in stock` : "Out of stock"}
+            </p>
+          </div>
+          <p className="text-lg font-bold text-primary">৳{medicine.price}</p>
+        </div>
+
+        {/* Action Button - Simplified */}
+        <div className="mt-4 flex items-center gap-2">
+          <Link 
+            href={`/shop/${medicine.id}`} 
+            className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-secondary py-2 text-sm font-medium text-secondary-foreground transition-colors hover:bg-primary hover:text-primary-foreground"
+          >
+            View Details
+          </Link>
+          <button className="flex h-9 w-9 items-center justify-center rounded-lg border border-input bg-background transition-colors hover:bg-accent">
+            <ShoppingCart className="h-4 w-4" />
+          </button>
+        </div>
+      </div>
     </div>
   );
 };
