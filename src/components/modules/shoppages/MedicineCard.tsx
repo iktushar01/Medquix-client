@@ -4,7 +4,7 @@ import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
-import { ShoppingCart, ArrowRight } from "lucide-react"; // Optional: if you use lucide
+
 
 interface MedicineProps {
   id: number;
@@ -55,15 +55,13 @@ export const MedicineCard = ({ medicine }: { medicine: MedicineProps }) => {
 
         {/* Action Button - Simplified */}
         <div className="mt-4 flex items-center gap-2">
-          <Link 
-            href={`/shop/${medicine.id}`} 
+          <Link
+            href={`/shop/${medicine.id}`}
             className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-secondary py-2 text-sm font-medium text-secondary-foreground transition-colors hover:bg-primary hover:text-primary-foreground"
           >
             View Details
           </Link>
-          <button className="flex h-9 w-9 items-center justify-center rounded-lg border border-input bg-background transition-colors hover:bg-accent">
-            <ShoppingCart className="h-4 w-4" />
-          </button>
+
         </div>
       </div>
     </div>
