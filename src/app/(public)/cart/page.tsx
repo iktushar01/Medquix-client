@@ -207,10 +207,12 @@ export default function CartPage() {
               <span className="text-2xl font-black text-primary">৳{subtotal.toFixed(2)}</span>
             </div>
 
-            <Button className="w-full h-12 text-lg font-bold gap-2 group shadow-lg shadow-primary/20">
-              Proceed to Checkout
-              <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
-            </Button>
+            <Link href="/cart/checkout">
+              <Button className="w-full h-12 text-lg font-bold gap-2 group shadow-lg shadow-primary/20">
+                Proceed to Checkout
+                <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+              </Button>
+            </Link>
 
             <div className="mt-6 flex items-center justify-center gap-2 text-xs text-muted-foreground">
               <span className="flex items-center gap-1 border-r pr-2">Secure Payment</span>
