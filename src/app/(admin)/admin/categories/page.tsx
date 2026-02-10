@@ -26,6 +26,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import Link from "next/link";
 
 interface Category {
   id: number;
@@ -122,9 +123,11 @@ export default function CategoryManagement() {
           </h1>
           <p className="text-slate-500 mt-1">Refine and organize your MediStore inventory classification.</p>
         </div>
-        <Button className="bg-emerald-600 hover:bg-emerald-700 rounded-xl h-12 px-6 gap-2 shadow-lg shadow-emerald-500/20 font-bold">
-          <Plus className="h-5 w-5" /> Add New Category
-        </Button>
+        <Link href="/admin/categories/create">
+          <Button className="bg-emerald-600 hover:bg-emerald-700 rounded-xl h-12 px-6 gap-2 shadow-lg shadow-emerald-500/20 font-bold">
+            <Plus className="h-5 w-5" /> Add New Category
+          </Button>
+        </Link>
       </div>
 
       {/* Table Section */}
