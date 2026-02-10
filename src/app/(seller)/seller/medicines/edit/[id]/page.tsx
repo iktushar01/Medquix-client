@@ -222,7 +222,7 @@ export default function EditMedicinePage() {
   };
 
   return (
-    <div className="container mx-auto max-w-3xl p-6">
+    <div className="container mx-auto max-w-7xl p-6">
       {/* Header */}
       <div className="mb-6">
         <Button variant="ghost" onClick={() => router.back()} className="mb-4 -ml-2">

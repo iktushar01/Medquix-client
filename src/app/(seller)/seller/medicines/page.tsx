@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Plus, Eye, Pencil, Trash2 } from "lucide-react";
+import Swal from "sweetalert2";
 
 type Medicine = {
   id: number;
@@ -33,6 +34,7 @@ export default function Page() {
           `${process.env.NEXT_PUBLIC_API_URL}/medicines`,
           {
             cache: "no-store",
+            credentials: "include",
           }
         );
 
@@ -48,30 +50,64 @@ export default function Page() {
     fetchMedicines();
   }, []);
 
-  // 🔹 Delete medicine
-  const handleDelete = async (id: number) => {
-    const confirmDelete = confirm("Are you sure you want to delete this medicine?");
-    if (!confirmDelete) return;
+ const handleDelete = async (id: number) => {
+  const isDark =
+    typeof window !== "undefined" &&
+    document.documentElement.classList.contains("dark");
 
-    try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/medicines/${id}`,
-        {
-          method: "DELETE",
-        }
-      );
+  const swal = Swal.mixin({
+    background: isDark ? "#020817" : "#ffffff", // slate-950 vibe
+    color: isDark ? "#e5e7eb" : "#020817",
+    confirmButtonColor: "#dc2626",
+    cancelButtonColor: "#6b7280",
+  });
 
-      if (!res.ok) {
-        throw new Error("Failed to delete medicine");
+  const result = await swal.fire({
+    title: "Delete medicine?",
+    text: "This action cannot be undone.",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "Yes, delete it",
+    cancelButtonText: "Cancel",
+  });
+
+  if (!result.isConfirmed) return;
+
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/seller/medicines/${id}`,
+      {
+        method: "DELETE",
+        credentials: "include",
       }
+    );
 
-      // old-school reliable optimistic update
-      setMedicines((prev) => prev.filter((m) => m.id !== id));
-    } catch (error) {
-      console.error("Delete failed", error);
-      alert("Something went wrong while deleting");
+    if (!res.ok) {
+      throw new Error("Delete failed");
     }
-  };
+
+    // 🧠 optimistic update (classic & correct)
+    setMedicines((prev) => prev.filter((m) => m.id !== id));
+
+    await swal.fire({
+      title: "Deleted!",
+      text: "Medicine has been removed.",
+      icon: "success",
+      timer: 1500,
+      showConfirmButton: false,
+    });
+  } catch (error) {
+    console.error("Delete failed", error);
+
+    await swal.fire({
+      title: "Error",
+      text: "Something went wrong while deleting.",
+      icon: "error",
+    });
+  }
+};
+
+
 
 
   if (loading) {
