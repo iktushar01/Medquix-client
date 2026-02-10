@@ -4,6 +4,7 @@ import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Menu } from "lucide-react";
+import Swal from "sweetalert2"; // Import SweetAlert2
 
 import { cn } from "@/lib/utils";
 import { authClient } from "@/lib/auth-client";
@@ -75,8 +76,43 @@ const Navbar = ({ className }: NavbarProps) => {
 
   const dashboardMenu = role ? roleMenus[role] ?? [] : [];
 
+  /* -------------------- SweetAlert Logout Logic -------------------- */
   const handleLogout = async () => {
-    await authClient.signOut();
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "You will be logged out of your account!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, logout!",
+      background: "hsl(var(--background))", // Adapts to your shadcn theme
+      color: "hsl(var(--foreground))",
+    });
+
+    if (result.isConfirmed) {
+      try {
+        await authClient.signOut();
+        
+        Swal.fire({
+          title: "Logged Out!",
+          text: "You have been successfully logged out.",
+          icon: "success",
+          timer: 2000,
+          showConfirmButton: false,
+          background: "hsl(var(--background))",
+          color: "hsl(var(--foreground))",
+        });
+      } catch (error) {
+        Swal.fire({
+          title: "Error!",
+          text: "Something went wrong. Please try again.",
+          icon: "error",
+          background: "hsl(var(--background))",
+          color: "hsl(var(--foreground))",
+        });
+      }
+    }
   };
 
   return (
@@ -84,7 +120,6 @@ const Navbar = ({ className }: NavbarProps) => {
       <div className="container mx-auto">
         {/* ================= DESKTOP ================= */}
         <nav className="hidden items-center justify-between lg:flex">
-          {/* Left */}
           <div className="flex items-center gap-6">
             <Link href="/">
               <Image
@@ -129,7 +164,6 @@ const Navbar = ({ className }: NavbarProps) => {
             </NavigationMenu>
           </div>
 
-          {/* Right */}
           <div className="flex items-center gap-2">
             <ModeToggle />
 
@@ -188,7 +222,7 @@ const Navbar = ({ className }: NavbarProps) => {
                       <Link
                         key={item.title}
                         href={item.url}
-                        className="text-md font-semibold"
+                        className="block py-2 text-md font-semibold"
                       >
                         {item.title}
                       </Link>
@@ -200,7 +234,7 @@ const Navbar = ({ className }: NavbarProps) => {
                         <Link
                           key={item.title}
                           href={item.url}
-                          className="text-md font-semibold"
+                          className="block py-2 text-md font-semibold"
                         >
                           {item.title}
                         </Link>
