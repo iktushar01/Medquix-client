@@ -36,7 +36,7 @@ interface CartResponse {
 export default function CartPage() {
   const queryClient = useQueryClient();
 
-  // 1. Fetch Cart Data
+  // Fetch Cart Data
   const { data, isLoading } = useQuery<CartResponse>({
     queryKey: ["cart"],
     queryFn: async () => {
@@ -45,23 +45,36 @@ export default function CartPage() {
     },
   });
 
-  // 2. Delete Item Mutation
+  // Delete Mutation
   const { mutate: removeItem } = useMutation({
-    mutationFn: async (itemId: number) => {
-      return await api.delete(`/cart/${itemId}`);
+    mutationFn: async (cartItemId: number) => {
+      return await api.delete(`/cart/${cartItemId}`);
     },
     onSuccess: () => {
+      Swal.fire({
+        icon: "success",
+        title: "Deleted!",
+        text: "Item removed from cart.",
+        background: "var(--card)",
+        color: "var(--foreground)",
+      });
       queryClient.invalidateQueries({ queryKey: ["cart"] });
+    },
+    onError: (err: any) => {
+      Swal.fire("Error", err.message || "Failed to remove item", "error");
     },
   });
 
-  // 3. Update Quantity Mutation
+  // Update Quantity Mutation
   const { mutate: updateQuantity } = useMutation({
     mutationFn: async ({ id, quantity }: { id: number; quantity: number }) => {
       return await api.patch(`/cart/${id}`, { quantity });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["cart"] });
+    },
+    onError: (err: any) => {
+      Swal.fire("Error", err.message || "Failed to update quantity", "error");
     },
   });
 
@@ -110,7 +123,10 @@ export default function CartPage() {
         {/* LEFT: ITEM LIST */}
         <div className="lg:col-span-2 space-y-4">
           {cartItems.map((item) => (
-            <Card key={item.id} className="p-4 overflow-hidden border-border bg-card shadow-sm transition-hover hover:shadow-md">
+            <Card
+              key={item.id}
+              className="p-4 overflow-hidden border-border bg-card shadow-sm transition-hover hover:shadow-md"
+            >
               <div className="flex items-center gap-4">
                 {/* Medicine Image */}
                 <div className="relative h-24 w-24 flex-shrink-0 rounded-lg overflow-hidden bg-muted border">
@@ -135,22 +151,30 @@ export default function CartPage() {
                 {/* Quantity Controls */}
                 <div className="flex flex-col items-end gap-3">
                   <div className="flex items-center border rounded-md bg-background">
-                    <Button 
-                      variant="ghost" size="icon" className="h-8 w-8"
-                      onClick={() => updateQuantity({ id: item.id, quantity: Math.max(1, item.quantity - 1) })}
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8"
+                      onClick={() =>
+                        updateQuantity({ id: item.id, quantity: Math.max(1, item.quantity - 1) })
+                      }
                       disabled={item.quantity <= 1}
                     >
                       <Minus className="h-3 w-3" />
                     </Button>
                     <span className="w-8 text-center text-sm font-semibold">{item.quantity}</span>
-                    <Button 
-                      variant="ghost" size="icon" className="h-8 w-8"
-                      onClick={() => updateQuantity({ id: item.id, quantity: Math.min(item.medicine.stock, item.quantity + 1) })}
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8"
+                      onClick={() =>
+                        updateQuantity({ id: item.id, quantity: Math.min(item.medicine.stock, item.quantity + 1) })
+                      }
                     >
                       <Plus className="h-3 w-3" />
                     </Button>
                   </div>
-                  <button 
+                  <button
                     onClick={() => handleDeleteConfirm(item.id)}
                     className="text-destructive hover:bg-destructive/10 p-2 rounded-full transition-colors"
                   >
@@ -166,7 +190,7 @@ export default function CartPage() {
         <div className="lg:col-span-1">
           <Card className="p-6 sticky top-24 border-border bg-card shadow-lg">
             <h2 className="text-xl font-bold mb-6">Order Summary</h2>
-            
+
             <div className="space-y-4 border-b pb-6 text-sm">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Subtotal</span>
