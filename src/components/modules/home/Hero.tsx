@@ -30,7 +30,7 @@ const slides = [
   },
   {
     id: 3,
-    title: "Sell Medicines on MediStore",
+    title: "Sell Medicines on MedQuix",
     subtitle: "Manage inventory, orders, and stock with ease",
     image: "https://i.postimg.cc/L5hVBH5j/Becoming-an-online-seller.jpg",
     ctaText: "Become a Seller",
@@ -41,8 +41,8 @@ const slides = [
 export default function HeroSlider() {
   return (
     <section className="w-full">
-      <Carousel 
-        opts={{ loop: true }} 
+      <Carousel
+        opts={{ loop: true }}
         className="relative w-full overflow-hidden"
       >
         <CarouselContent>
@@ -50,7 +50,7 @@ export default function HeroSlider() {
             <CarouselItem key={slide.id}>
               {/* Hero Container */}
               <div className="relative h-[60vh] md:h-[75vh] w-full flex items-center justify-center">
-                
+
                 {/* 1. Main Background Image */}
                 <Image
                   src={slide.image}
@@ -72,8 +72,8 @@ export default function HeroSlider() {
                     {slide.subtitle}
                   </p>
                   <Link href={slide.ctaLink}>
-                    <Button 
-                      size="lg" 
+                    <Button
+                      size="lg"
                       className="bg-emerald-600 hover:bg-emerald-700 text-white border-none px-8 py-6 text-lg rounded-full transition-all hover:scale-105"
                     >
                       {slide.ctaText}

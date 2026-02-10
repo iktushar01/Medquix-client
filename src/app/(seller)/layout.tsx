@@ -35,14 +35,14 @@ import { ModeToggle } from "@/components/ui/modeToggle";
 /* -------------------- Helper Functions -------------------- */
 const generateBreadcrumbs = (pathname: string) => {
   const segments = pathname.split("/").filter(Boolean);
-  
+
   const breadcrumbs = segments.map((segment, index) => {
     const href = "/" + segments.slice(0, index + 1).join("/");
     const label = segment
       .split("-")
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(" ");
-    
+
     return { href, label, isLast: index === segments.length - 1 };
   });
 
@@ -52,7 +52,7 @@ const generateBreadcrumbs = (pathname: string) => {
 const getPageTitle = (pathname: string): string => {
   const segments = pathname.split("/").filter(Boolean);
   if (segments.length === 0) return "Home";
-  
+
   const lastSegment = segments[segments.length - 1];
   return lastSegment
     .split("-")
@@ -83,7 +83,7 @@ export default function DashboardLayout({
             orientation="vertical"
             className="mr-2 h-4"
           />
-          
+
           {/* Breadcrumbs */}
           <Breadcrumb className="hidden md:flex flex-1">
             <BreadcrumbList>
@@ -176,7 +176,7 @@ export default function DashboardLayout({
           <div className="flex items-center md:hidden">
             <h1 className="text-lg font-semibold">{pageTitle}</h1>
           </div>
-          
+
           {/* Children Content */}
           <div className="flex-1">{children}</div>
         </main>
@@ -184,7 +184,7 @@ export default function DashboardLayout({
         {/* Footer (Optional) */}
         <footer className="border-t py-4 px-6">
           <div className="flex flex-col md:flex-row justify-between items-center gap-2 text-sm text-muted-foreground">
-            <p>© 2024 MediStore. All rights reserved.</p>
+            <p>© 2024 MedQuix. All rights reserved.</p>
             <div className="flex gap-4">
               <a href="/privacy" className="hover:text-foreground transition-colors">
                 Privacy Policy

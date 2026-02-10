@@ -1,12 +1,12 @@
 "use client";
 
 import React from "react";
-import { 
-  Mail, 
-  Phone, 
-  MapPin, 
-  MessageSquare, 
-  Clock, 
+import {
+  Mail,
+  Phone,
+  MapPin,
+  MessageSquare,
+  Clock,
   Send,
   LifeBuoy,
   HelpCircle
@@ -18,7 +18,7 @@ import { Textarea } from "@/components/ui/textarea";
 export default function SupportPage() {
   return (
     <div className="min-h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100">
-      
+
       {/* 1. HERO HEADER */}
       <section className="relative py-20 bg-slate-50 dark:bg-slate-900/50 border-b overflow-hidden">
         <div className="absolute top-0 right-0 w-1/3 h-full bg-emerald-500/5 blur-[120px] rounded-full" />
@@ -38,19 +38,19 @@ export default function SupportPage() {
       {/* 2. CONTACT OPTIONS GRID */}
       <section className="container mx-auto px-6 -mt-10 relative z-20">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <ContactCard 
+          <ContactCard
             icon={<Phone className="h-6 w-6" />}
             title="Call Support"
             detail="+880 1234-567890"
             sub="Available 9am - 9pm"
           />
-          <ContactCard 
+          <ContactCard
             icon={<Mail className="h-6 w-6" />}
             title="Email Us"
-            detail="support@medistore.com"
+            detail="support@MedQuix.com"
             sub="Response within 24h"
           />
-          <ContactCard 
+          <ContactCard
             icon={<MapPin className="h-6 w-6" />}
             title="Office"
             detail="Dhaka, Bangladesh"
@@ -62,13 +62,13 @@ export default function SupportPage() {
       {/* 3. MAIN FORM SECTION */}
       <section className="container mx-auto px-6 py-20">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
-          
+
           {/* Left: Info */}
           <div className="space-y-8">
             <div>
               <h2 className="text-3xl font-bold mb-4">Send us a message</h2>
               <p className="text-slate-600 dark:text-slate-400">
-                Have a specific question about a medicine or your seller account? 
+                Have a specific question about a medicine or your seller account?
                 Fill out the form and our pharmacists or support staff will get back to you.
               </p>
             </div>

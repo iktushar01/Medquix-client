@@ -93,7 +93,7 @@ const Navbar = ({ className }: NavbarProps) => {
     if (result.isConfirmed) {
       try {
         await authClient.signOut();
-        
+
         Swal.fire({
           title: "Logged Out!",
           text: "You have been successfully logged out.",
@@ -124,7 +124,7 @@ const Navbar = ({ className }: NavbarProps) => {
             <Link href="/">
               <Image
                 src="https://i.postimg.cc/Bv1xhwD0/logo.png"
-                alt="MediStore Logo"
+                alt="MedQuix Logo"
                 width={80}
                 height={20}
                 priority
@@ -197,7 +197,7 @@ const Navbar = ({ className }: NavbarProps) => {
             <Link href="/">
               <Image
                 src="https://i.postimg.cc/Bv1xhwD0/logo.png"
-                alt="MediStore Logo"
+                alt="MedQuix Logo"
                 width={60}
                 height={20}
                 priority
@@ -213,7 +213,7 @@ const Navbar = ({ className }: NavbarProps) => {
 
               <SheetContent className="overflow-y-auto">
                 <SheetHeader>
-                  <SheetTitle>MediStore 💊</SheetTitle>
+                  <SheetTitle>MedQuix 💊</SheetTitle>
                 </SheetHeader>
 
                 <div className="flex flex-col gap-6 p-4">

@@ -28,12 +28,12 @@ export function WhyChooseUs() {
     <section className="py-20 bg-slate-50 dark:bg-slate-900/50">
       <div className="container mx-auto px-4">
         <div className="text-center max-w-2xl mx-auto mb-16">
-          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl mb-4">Why Choose MediStore?</h2>
+          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl mb-4">Why Choose MedQuix?</h2>
           <p className="text-muted-foreground">
             We bridge the gap between local pharmacies and customers, ensuring safe and accessible healthcare for everyone.
           </p>
         </div>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {features.map((feature, index) => (
             <div key={index} className="bg-white dark:bg-slate-950 p-8 rounded-2xl shadow-sm border hover:border-primary/50 transition-colors">

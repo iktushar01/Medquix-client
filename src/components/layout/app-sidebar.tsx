@@ -155,14 +155,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         >
           <Image
             src="https://i.postimg.cc/Bv1xhwD0/logo.png"
-            alt="MediStore Logo"
+            alt="MedQuix Logo"
             width={60}
             height={30}
             priority
             className="object-contain"
           />
           <div className="flex flex-col">
-            <span className="font-bold text-lg">MediStore</span>
+            <span className="font-bold text-lg">MedQuix</span>
             {role && (
               <span
                 className={`text-xs px-2 py-0.5 rounded-full w-fit ${getRoleBadgeColor(
@@ -207,11 +207,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       <SidebarMenuButton asChild isActive={isActive}>
                         <Link
                           href={item.url}
-                          className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all ${
-                            isActive
+                          className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all ${isActive
                               ? "bg-primary text-primary-foreground shadow-sm font-medium"
                               : "hover:bg-accent hover:text-accent-foreground"
-                          }`}
+                            }`}
                         >
                           <Icon className="h-5 w-5" />
                           <span>{item.title}</span>
