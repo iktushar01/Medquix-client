@@ -14,13 +14,8 @@ import {
   CreditCard,
   Bell,
   ChevronRight,
-  Package,
-  Heart,
-  Star,
-  Clock,
-  MapPinned,
-  Lock,
-  FileText,
+  Sparkles,
+  Award,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -30,7 +25,7 @@ interface UserProfile {
   name: string;
   email: string;
   phone?: string;
-  role: "customer" | "seller" | "admin";
+  role: string;
   avatarUrl?: string;
   location?: string;
   createdAt?: string;
@@ -44,7 +39,7 @@ export default function ProfilePage() {
     const fetchProfile = async () => {
       try {
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api"}/auth/me`,
+          `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api"}/profile`,
           {
             method: "GET",
             credentials: "include",
@@ -69,296 +64,129 @@ export default function ProfilePage() {
   if (loading) return <LoadingState />;
   if (!profile) return <ErrorState />;
 
-  const getRoleBadgeColor = (role: string) => {
-    switch (role) {
-      case "admin":
-        return "bg-destructive/10 text-destructive border-destructive/20";
-      case "seller":
-        return "bg-primary/10 text-primary border-primary/20";
-      default:
-        return "bg-accent/10 text-accent-foreground border-accent/20";
-    }
-  };
-
   return (
-    <div className="min-h-screen bg-background py-8 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2">My Profile</h1>
-          <p className="text-muted-foreground">
-            Manage your account settings and preferences
-          </p>
+    <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-accent/20 py-20 px-4 sm:px-6 lg:px-8">
+      {/* Decorative Elements */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary/10 rounded-full blur-3xl" />
+        <div className="absolute top-1/2 -left-40 w-80 h-80 bg-accent/10 rounded-full blur-3xl" />
+      </div>
+
+      <div className="max-w-6xl mx-auto relative">
+        {/* Header Banner */}
+        <div className="mb-8 text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 border border-primary/20 rounded-full mb-4">
+            <Sparkles className="h-4 w-4 text-primary" />
+            <span className="text-sm font-medium text-primary">Profile Overview</span>
+          </div>
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+            Your Account
+          </h1>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* LEFT SIDEBAR */}
-          <div className="lg:col-span-1 space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* LEFT COLUMN */}
+          <div className="lg:col-span-4 space-y-6">
             {/* Profile Card */}
-            <div className="bg-card rounded-2xl p-6 border border-border shadow-sm">
-              {/* Avatar Section */}
-              <div className="relative w-28 h-28 mx-auto mb-5">
-                <div className="absolute inset-0 bg-primary/20 rounded-full blur-xl" />
-                <img
-                  src={
-                    profile.avatarUrl ||
-                    `https://api.dicebear.com/7.x/avataaars/svg?seed=${profile.name}`
-                  }
-                  alt="avatar"
-                  className="relative rounded-full border-4 border-background shadow-lg"
-                />
-                <button className="absolute bottom-0 right-0 p-2.5 bg-primary text-primary-foreground rounded-full shadow-lg hover:scale-105 transition-transform">
-                  <Camera className="h-4 w-4" />
-                </button>
-              </div>
-
-              {/* User Info */}
-              <div className="text-center space-y-3">
-                <div>
-                  <div className="flex items-center justify-center gap-2 mb-1">
-                    <h2 className="text-xl font-bold text-foreground">
-                      {profile.name}
-                    </h2>
-                    {profile.role === "admin" && (
-                      <ShieldCheck className="h-5 w-5 text-primary" />
-                    )}
+            <div className="group relative bg-card/80 backdrop-blur-xl rounded-3xl p-8 border border-border shadow-lg hover:shadow-xl transition-all duration-300">
+              {/* Gradient Border Effect */}
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-accent/20 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10 blur-xl" />
+              
+              <div className="relative">
+                {/* Avatar */}
+                <div className="relative w-32 h-32 mx-auto mb-6">
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary to-accent rounded-3xl opacity-20 blur-md" />
+                  <img
+                    src={
+                      profile.avatarUrl ||
+                      `https://api.dicebear.com/7.x/avataaars/svg?seed=${profile.name}`
+                    }
+                    alt="avatar"
+                    className="relative rounded-3xl border-4 border-background shadow-xl"
+                  />
+                  <button className="absolute -bottom-2 -right-2 p-3 bg-primary text-primary-foreground rounded-2xl shadow-lg hover:scale-110 transition-transform duration-200">
+                    <Camera className="h-4 w-4" />
+                  </button>
+                  {/* Status Indicator */}
+                  <div className="absolute -top-1 -right-1 w-6 h-6 bg-primary rounded-full border-4 border-background">
+                    <div className="w-full h-full bg-primary rounded-full animate-ping opacity-75" />
                   </div>
-                  <p className="text-sm text-muted-foreground">{profile.email}</p>
                 </div>
 
-                <Badge
-                  className={`${getRoleBadgeColor(profile.role)} uppercase text-xs font-semibold px-3 py-1`}
-                >
-                  {profile.role}
-                </Badge>
+                {/* User Info */}
+                <div className="text-center space-y-3">
+                  <div className="flex justify-center items-center gap-2">
+                    <h2 className="text-2xl font-bold">{profile.name}</h2>
+                    <ShieldCheck className="h-5 w-5 text-primary" />
+                  </div>
+                  <p className="text-muted-foreground text-sm">{profile.email}</p>
+
+                  <div className="flex items-center justify-center gap-2">
+                    <Badge className="bg-primary/10 text-primary border-primary/20 hover:bg-primary/20 uppercase text-xs font-semibold px-3 py-1">
+                      <Award className="h-3 w-3 mr-1" />
+                      {profile.role}
+                    </Badge>
+                  </div>
+                </div>
+
               </div>
-
-              {/* Quick Stats
-              <div className="grid grid-cols-3 gap-3 mt-6 pt-5 border-t border-border">
-                <div className="text-center">
-                  <p className="text-xl font-bold text-primary">
-                    {profile.role === "customer" ? "12" : "48"}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {profile.role === "customer" ? "Orders" : "Products"}
-                  </p>
-                </div>
-                <div className="text-center border-x border-border">
-                  <p className="text-xl font-bold text-primary">
-                    {profile.role === "customer" ? "5" : "156"}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {profile.role === "customer" ? "Saved" : "Sales"}
-                  </p>
-                </div>
-                <div className="text-center">
-                  <p className="text-xl font-bold text-primary">4.8</p>
-                  <p className="text-xs text-muted-foreground">Rating</p>
-                </div>
-              </div> */}
             </div>
 
-            {/* Role-Specific Quick Links
-            <div className="bg-card rounded-2xl border border-border overflow-hidden shadow-sm">
-              <div className="p-4 bg-muted/50 border-b border-border">
-                <h3 className="font-semibold text-sm text-foreground">Quick Links</h3>
-              </div>
-              <div className="divide-y divide-border">
-                {profile.role === "customer" && (
-                  <>
-                    <QuickLink
-                      icon={<Package className="h-4 w-4" />}
-                      label="My Orders"
-                      href="/orders"
-                    />
-                    <QuickLink
-                      icon={<Heart className="h-4 w-4" />}
-                      label="Saved Items"
-                      href="/saved"
-                    />
-                  </>
-                )}
-                {profile.role === "seller" && (
-                  <>
-                    <QuickLink
-                      icon={<Package className="h-4 w-4" />}
-                      label="Inventory"
-                      href="/seller/medicines"
-                    />
-                    <QuickLink
-                      icon={<FileText className="h-4 w-4" />}
-                      label="Orders"
-                      href="/seller/orders"
-                    />
-                  </>
-                )}
-                {profile.role === "admin" && (
-                  <>
-                    <QuickLink
-                      icon={<User className="h-4 w-4" />}
-                      label="Manage Users"
-                      href="/admin/users"
-                    />
-                    <QuickLink
-                      icon={<Package className="h-4 w-4" />}
-                      label="All Orders"
-                      href="/admin/orders"
-                    />
-                  </>
-                )}
-              </div>
-            </div> */}
-
-            {/* Logout */}
+            {/* Logout Button */}
             <Button
-              variant="outline"
-              className="w-full justify-start gap-3 h-12 rounded-xl border-destructive/20 text-destructive hover:bg-destructive/10 hover:border-destructive/30"
+              variant="ghost"
+              className="w-full justify-start gap-3 h-14 rounded-2xl text-destructive hover:bg-destructive/10 hover:text-destructive border border-transparent hover:border-destructive/20 transition-all duration-200"
               onClick={async () => {
-                await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/logout`, {
-                  method: "POST",
-                  credentials: "include",
-                });
+                await fetch(
+                  `${process.env.NEXT_PUBLIC_API_URL}/auth/sign-out`,
+                  { method: "POST", credentials: "include" }
+                );
                 window.location.href = "/login";
               }}
             >
-              <LogOut className="h-4 w-4" />
-              <span className="font-medium">Logout</span>
+              <LogOut className="h-5 w-5" /> 
+              <span className="font-semibold">Logout</span>
             </Button>
           </div>
 
-          {/* MAIN CONTENT */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Personal Information Section */}
-            <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
-              <div className="p-5 bg-muted/50 border-b border-border flex items-center justify-between">
-                <div>
-                  <h3 className="font-semibold text-foreground">
-                    Personal Information
-                  </h3>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    Your contact details and account info
-                  </p>
-                </div>
-                <Button variant="ghost" size="sm" className="text-primary">
-                  Edit
-                </Button>
-              </div>
-
-              <div className="p-6 grid sm:grid-cols-2 gap-4">
-                <InfoField
-                  icon={<Mail className="h-4 w-4 text-primary" />}
-                  label="Email Address"
-                  value={profile.email}
-                />
-                <InfoField
-                  icon={<Phone className="h-4 w-4 text-primary" />}
-                  label="Phone Number"
-                  value={profile.phone || "Not provided"}
-                />
-                <InfoField
-                  icon={<MapPinned className="h-4 w-4 text-primary" />}
-                  label="Location"
-                  value={profile.location || "Bangladesh"}
-                />
-                <InfoField
-                  icon={<Calendar className="h-4 w-4 text-primary" />}
-                  label="Member Since"
-                  value={
-                    profile.createdAt
-                      ? new Date(profile.createdAt).toLocaleDateString("en-US", {
-                          month: "long",
-                          year: "numeric",
-                        })
-                      : "—"
-                  }
-                />
-              </div>
+          {/* RIGHT COLUMN */}
+          <div className="lg:col-span-8 space-y-6">
+            {/* Info Grid */}
+            <div className="grid sm:grid-cols-2 gap-4">
+              <InfoTile 
+                icon={<Mail className="h-5 w-5 text-primary" />} 
+                label="Email" 
+                value={profile.email}
+                gradient="from-primary/20 to-primary/5"
+              />
+              <InfoTile
+                icon={<Phone className="h-5 w-5 text-accent" />}
+                label="Phone"
+                value={profile.phone || "Not set"}
+                gradient="from-accent/20 to-accent/5"
+              />
+              <InfoTile
+                icon={<MapPin className="h-5 w-5 text-primary" />}
+                label="Location"
+                value={profile.location || "Bangladesh"}
+                gradient="from-primary/20 to-primary/5"
+              />
+              <InfoTile
+                icon={<Calendar className="h-5 w-5 text-accent" />}
+                label="Member Since"
+                value={
+                  profile.createdAt
+                    ? new Date(profile.createdAt).toLocaleDateString('en-US', { 
+                        month: 'short', 
+                        day: 'numeric',
+                        year: 'numeric' 
+                      })
+                    : "—"
+                }
+                gradient="from-accent/20 to-accent/5"
+              />
             </div>
 
-            {/* Account Settings */}
-            <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
-              <div className="p-5 bg-muted/50 border-b border-border">
-                <h3 className="font-semibold text-foreground">Account Settings</h3>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  Manage your preferences and security
-                </p>
-              </div>
-
-              <div className="divide-y divide-border">
-                <SettingItem
-                  icon={<User className="h-5 w-5 text-primary" />}
-                  title="Profile Details"
-                  subtitle="Update your name, photo and bio"
-                  iconBg="bg-primary/10"
-                />
-                <SettingItem
-                  icon={<Lock className="h-5 w-5 text-accent" />}
-                  title="Security"
-                  subtitle="Password and two-factor authentication"
-                  iconBg="bg-accent/10"
-                />
-                <SettingItem
-                  icon={<Bell className="h-5 w-5 text-primary" />}
-                  title="Notifications"
-                  subtitle="Email and push notification preferences"
-                  iconBg="bg-primary/10"
-                />
-                {profile.role === "customer" && (
-                  <SettingItem
-                    icon={<MapPin className="h-5 w-5 text-accent" />}
-                    title="Addresses"
-                    subtitle="Manage your delivery addresses"
-                    iconBg="bg-accent/10"
-                  />
-                )}
-                {profile.role === "customer" && (
-                  <SettingItem
-                    icon={<CreditCard className="h-5 w-5 text-primary" />}
-                    title="Payment Methods"
-                    subtitle="Saved payment options (COD available)"
-                    iconBg="bg-primary/10"
-                  />
-                )}
-              </div>
-            </div>
-
-            {/* Trust & Safety Banner */}
-            <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent rounded-2xl p-6 border border-primary/20">
-              <div className="flex items-start gap-4">
-                <div className="p-3 bg-primary/20 rounded-xl">
-                  <ShieldCheck className="h-6 w-6 text-primary" />
-                </div>
-                <div className="flex-1">
-                  <h4 className="font-semibold text-foreground mb-1">
-                    Your Health, Our Priority
-                  </h4>
-                  <p className="text-sm text-muted-foreground mb-3">
-                    All medicines are verified and sourced from licensed pharmacies.
-                    Your data is encrypted and secure.
-                  </p>
-                  {/* <div className="flex flex-wrap gap-2">
-                    <Badge
-                      variant="outline"
-                      className="bg-background text-xs border-primary/30"
-                    >
-                      ✓ SSL Encrypted
-                    </Badge>
-                    <Badge
-                      variant="outline"
-                      className="bg-background text-xs border-primary/30"
-                    >
-                      ✓ Licensed Sellers
-                    </Badge>
-                    <Badge
-                      variant="outline"
-                      className="bg-background text-xs border-primary/30"
-                    >
-                      ✓ Quality Assured
-                    </Badge>
-                  </div> */}
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>
@@ -366,52 +194,47 @@ export default function ProfilePage() {
   );
 }
 
-/* ========== COMPONENTS ========== */
+/* ========== UI COMPONENTS ========== */
 
-function InfoField({ icon, label, value }: any) {
+function InfoTile({ icon, label, value, gradient }: any) {
   return (
-    <div className="space-y-2">
-      <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground uppercase tracking-wide">
-        {icon}
-        <span>{label}</span>
+    <div className="group relative bg-card/80 backdrop-blur-xl p-6 rounded-2xl border border-border hover:border-primary/30 transition-all duration-300 overflow-hidden">
+      <div className={`absolute inset-0 bg-gradient-to-br ${gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
+      
+      <div className="relative">
+        <div className="mb-3 p-2 bg-background/50 rounded-xl w-fit">
+          {icon}
+        </div>
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
+          {label}
+        </p>
+        <p className="font-bold text-foreground text-lg">{value}</p>
       </div>
-      <p className="text-sm font-medium text-foreground pl-6">{value}</p>
     </div>
   );
 }
 
-function SettingItem({ icon, title, subtitle, iconBg }: any) {
+function ActionItem({ icon, title, subtitle, iconBg }: any) {
   return (
-    <button className="w-full flex items-center gap-4 p-5 hover:bg-muted/50 transition-colors group">
-      <div className={`p-2.5 ${iconBg} rounded-xl`}>{icon}</div>
+    <button className="w-full flex items-center gap-4 p-5 hover:bg-muted/50 transition-all duration-200 group">
+      <div className={`p-3 ${iconBg} rounded-xl group-hover:scale-110 transition-transform duration-200`}>
+        {icon}
+      </div>
       <div className="flex-1 text-left">
-        <p className="font-medium text-foreground mb-0.5">{title}</p>
+        <p className="font-semibold text-foreground mb-0.5">{title}</p>
         <p className="text-xs text-muted-foreground">{subtitle}</p>
       </div>
-      <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
+      <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all duration-200" />
     </button>
-  );
-}
-
-function QuickLink({ icon, label, href }: any) {
-  return (
-    <a
-      href={href}
-      className="flex items-center gap-3 p-3 hover:bg-muted/50 transition-colors group"
-    >
-      <div className="text-primary">{icon}</div>
-      <span className="text-sm font-medium text-foreground flex-1">{label}</span>
-      <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:translate-x-1 transition-transform" />
-    </a>
   );
 }
 
 function LoadingState() {
   return (
-    <div className="h-screen flex items-center justify-center bg-background">
+    <div className="h-screen flex items-center justify-center bg-gradient-to-br from-background via-muted/30 to-accent/20">
       <div className="text-center">
         <div className="relative w-16 h-16 mx-auto mb-4">
-          <div className="absolute inset-0 border-4 border-primary/20 rounded-full" />
+          <div className="absolute inset-0 border-4 border-primary/30 rounded-full" />
           <div className="absolute inset-0 border-4 border-primary border-t-transparent rounded-full animate-spin" />
         </div>
         <p className="text-muted-foreground font-medium">Loading your profile...</p>
@@ -422,7 +245,7 @@ function LoadingState() {
 
 function ErrorState() {
   return (
-    <div className="h-screen flex items-center justify-center bg-background px-4">
+    <div className="h-screen flex items-center justify-center bg-gradient-to-br from-background via-muted/30 to-accent/20 px-4">
       <div className="text-center max-w-md">
         <div className="w-20 h-20 mx-auto mb-6 bg-destructive/10 rounded-full flex items-center justify-center">
           <LogOut className="h-10 w-10 text-destructive" />
@@ -431,9 +254,9 @@ function ErrorState() {
         <p className="text-muted-foreground mb-6">
           Your session has expired. Please log in again to continue.
         </p>
-        <Button
+        <Button 
           onClick={() => (window.location.href = "/login")}
-          className="h-11 px-8 rounded-xl font-medium"
+          className="bg-primary text-primary-foreground hover:bg-primary/90 h-12 px-8 rounded-xl font-semibold"
         >
           Go to Login
         </Button>
