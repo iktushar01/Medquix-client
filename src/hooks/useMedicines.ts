@@ -23,13 +23,26 @@ export interface Medicine {
     images: MedicineImage[];
 }
 
-export const useMedicines = (categoryId?: number | null) => {
+export interface MedicineFilters {
+    categoryId?: number | null;
+    search?: string;
+    minPrice?: number;
+    maxPrice?: number;
+    manufacturer?: string;
+}
+
+export const useMedicines = (filters?: MedicineFilters) => {
     return useQuery<Medicine[]>({
-        queryKey: ["medicines", categoryId],
+        queryKey: ["medicines", filters],
         queryFn: async () => {
-            const res = await api.get("/medicines", {
-                params: { categoryId },
-            });
+            const params = new URLSearchParams();
+            if (filters?.categoryId) params.append("categoryId", filters.categoryId.toString());
+            if (filters?.search) params.append("searchTerm", filters.search);
+            if (filters?.minPrice) params.append("minPrice", filters.minPrice.toString());
+            if (filters?.maxPrice) params.append("maxPrice", filters.maxPrice.toString());
+            if (filters?.manufacturer) params.append("manufacturer", filters.manufacturer);
+
+            const res = await api.get("/medicines", { params });
             return res.data.data;
         },
     });
