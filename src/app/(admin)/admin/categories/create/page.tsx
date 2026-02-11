@@ -5,11 +5,11 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/axios";
 import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
-import { 
-  PlusCircle, 
-  ArrowLeft, 
-  Layers, 
-  CheckCircle2, 
+import {
+  PlusCircle,
+  ArrowLeft,
+  Layers,
+  CheckCircle2,
   Sparkles,
   Info
 } from "lucide-react";
@@ -50,10 +50,10 @@ export default function CreateCategoryPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["categories"] });
-      
+
       themeSwal().fire({
         title: "Category Created!",
-        text: `"${name}" has been successfully added to MediStore.`,
+        text: `"${name}" has been successfully added to MedQuix.`,
         icon: "success",
         iconColor: "#10b981",
       }).then(() => {
@@ -79,10 +79,10 @@ export default function CreateCategoryPage() {
   return (
     <div className="min-h-screen bg-slate-50/50 dark:bg-slate-950 p-6 lg:p-12 transition-colors duration-300">
       <div className="max-w-4xl mx-auto">
-        
+
         {/* Back Button */}
-        <Button 
-          variant="ghost" 
+        <Button
+          variant="ghost"
           onClick={() => router.back()}
           className="mb-8 hover:bg-white dark:hover:bg-slate-900 gap-2 text-slate-500 font-bold"
         >
@@ -90,7 +90,7 @@ export default function CreateCategoryPage() {
         </Button>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-          
+
           {/* Left: Form */}
           <div className="lg:col-span-7 space-y-8">
             <div>
@@ -107,8 +107,8 @@ export default function CreateCategoryPage() {
                 <label className="text-sm font-bold text-slate-700 dark:text-slate-300 ml-1 uppercase tracking-wider">
                   Category Name
                 </label>
-                <Input 
-                  placeholder="e.g., Surgical Devices..." 
+                <Input
+                  placeholder="e.g., Surgical Devices..."
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   className="h-14 px-6 rounded-2xl bg-white dark:bg-slate-900 border-none shadow-sm focus-visible:ring-emerald-500 text-lg dark:text-white"
@@ -123,8 +123,8 @@ export default function CreateCategoryPage() {
                 </p>
               </div>
 
-              <Button 
-                type="submit" 
+              <Button
+                type="submit"
                 disabled={isPending || !name}
                 className="w-full h-14 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-bold text-lg gap-2 shadow-xl shadow-emerald-500/20 transition-all active:scale-95 disabled:opacity-50"
               >
@@ -139,11 +139,11 @@ export default function CreateCategoryPage() {
               <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4 ml-2">Live Preview</h3>
               <Card className="rounded-[2.5rem] border-none shadow-2xl bg-white dark:bg-slate-900 overflow-hidden ring-1 ring-slate-200 dark:ring-slate-800">
                 <div className="h-32 bg-emerald-600 flex items-center justify-center relative">
-                   <Sparkles className="absolute top-4 right-4 text-emerald-400 opacity-50" />
-                   <Layers className="h-12 w-12 text-white/20 absolute -bottom-4 -left-4 scale-150" />
-                   <div className="h-20 w-20 bg-white/10 backdrop-blur-md rounded-3xl flex items-center justify-center border border-white/20">
-                      <Layers className="h-10 w-10 text-white" />
-                   </div>
+                  <Sparkles className="absolute top-4 right-4 text-emerald-400 opacity-50" />
+                  <Layers className="h-12 w-12 text-white/20 absolute -bottom-4 -left-4 scale-150" />
+                  <div className="h-20 w-20 bg-white/10 backdrop-blur-md rounded-3xl flex items-center justify-center border border-white/20">
+                    <Layers className="h-10 w-10 text-white" />
+                  </div>
                 </div>
                 <CardContent className="p-8 text-center">
                   <Badge className="bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400 mb-4 border-none px-4 py-1 font-bold">
@@ -155,7 +155,7 @@ export default function CreateCategoryPage() {
                   <p className="text-slate-400 text-sm mt-2">
                     {name ? `Facilitating ${name} distribution` : "Enter a name to see the preview"}
                   </p>
-                  
+
                   <div className="mt-8 pt-8 border-t border-slate-100 dark:border-slate-800 grid grid-cols-2 gap-4">
                     <div className="text-left">
                       <p className="text-[10px] uppercase font-bold text-slate-400 tracking-tighter">Status</p>

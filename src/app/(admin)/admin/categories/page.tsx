@@ -37,7 +37,7 @@ interface Category {
 
 export default function CategoryManagement() {
   const queryClient = useQueryClient();
-  
+
   // Modal State
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
@@ -55,7 +55,7 @@ export default function CategoryManagement() {
         cancelButton: "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold py-3 px-8 rounded-xl transition-all mx-2"
       },
       buttonsStyling: false,
-      background: isDark ? "#0f172a" : "#ffffff", 
+      background: isDark ? "#0f172a" : "#ffffff",
       color: isDark ? "#f8fafc" : "#0f172a",
     });
   };
@@ -78,15 +78,15 @@ export default function CategoryManagement() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["categories"] });
       setIsEditOpen(false);
-      themeSwal().fire({ 
-        title: "Success", 
-        text: "Category updated successfully", 
-        icon: "success", 
+      themeSwal().fire({
+        title: "Success",
+        text: "Category updated successfully",
+        icon: "success",
         iconColor: "#10b981",
-        toast: true, 
-        position: "top-end", 
-        timer: 2000, 
-        showConfirmButton: false 
+        toast: true,
+        position: "top-end",
+        timer: 2000,
+        showConfirmButton: false
       });
     },
     onError: (err: any) => {
@@ -125,16 +125,16 @@ export default function CategoryManagement() {
   const handleUpdate = (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedCategory) return;
-    updateMutation.mutate({ 
-      id: selectedCategory.id, 
-      data: { name: editName } 
+    updateMutation.mutate({
+      id: selectedCategory.id,
+      data: { name: editName }
     });
   };
 
   const toggleStatus = (category: Category) => {
-    updateMutation.mutate({ 
-      id: category.id, 
-      data: { isActive: !category.isActive } 
+    updateMutation.mutate({
+      id: category.id,
+      data: { isActive: !category.isActive }
     });
   };
 
@@ -155,14 +155,14 @@ export default function CategoryManagement() {
 
   return (
     <div className="p-6 lg:p-10 bg-slate-50/50 dark:bg-slate-950/50 min-h-screen transition-colors duration-300">
-      
+
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
         <div>
           <h1 className="text-3xl font-black tracking-tight flex items-center gap-3 text-slate-900 dark:text-white">
             <Layers className="h-8 w-8 text-emerald-500" /> Category Lab
           </h1>
-          <p className="text-slate-500 dark:text-slate-400 mt-1">Refine and organize your MediStore inventory classification.</p>
+          <p className="text-slate-500 dark:text-slate-400 mt-1">Refine and organize your MedQuix inventory classification.</p>
         </div>
         <Link href="/admin/categories/create">
           <Button className="bg-emerald-600 hover:bg-emerald-700 rounded-xl h-12 px-6 gap-2 shadow-lg shadow-emerald-500/20 font-bold transition-transform active:scale-95">
@@ -196,40 +196,39 @@ export default function CategoryManagement() {
                     </div>
                   </div>
                 </TableCell>
-                
+
                 <TableCell>
                   <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 text-sm">
                     <Calendar className="h-4 w-4" />
                     {new Date(category.createdAt).toLocaleDateString()}
                   </div>
                 </TableCell>
-                
+
                 <TableCell>
                   <button onClick={() => toggleStatus(category)} className="transition-transform active:scale-90">
-                    <Badge className={`rounded-full px-3 py-1 cursor-pointer transition-all border-none ${
-                      category.isActive 
-                      ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400" 
-                      : "bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400"
-                    }`}>
+                    <Badge className={`rounded-full px-3 py-1 cursor-pointer transition-all border-none ${category.isActive
+                        ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400"
+                        : "bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400"
+                      }`}>
                       {category.isActive ? "Active" : "Hidden"}
                     </Badge>
                   </button>
                 </TableCell>
-                
+
                 <TableCell className="text-right px-6">
                   <div className="flex items-center justify-end gap-2">
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
+                    <Button
+                      variant="outline"
+                      size="sm"
                       onClick={() => openEditModal(category)}
                       className="h-9 w-9 p-0 rounded-lg border-slate-200 dark:border-slate-700 hover:bg-emerald-500 hover:text-white transition-colors"
                     >
                       <Pencil className="h-4 w-4" />
                     </Button>
 
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
+                    <Button
+                      variant="outline"
+                      size="sm"
                       onClick={() => handleDelete(category.id)}
                       className="h-9 w-9 p-0 rounded-lg border-slate-200 dark:border-slate-700 hover:bg-red-500 hover:text-white transition-colors"
                     >
@@ -251,13 +250,13 @@ export default function CategoryManagement() {
               <Pencil className="h-5 w-5" /> Edit Category
             </DialogTitle>
           </DialogHeader>
-          
+
           <form onSubmit={handleUpdate} className="p-6 space-y-6">
             <div className="space-y-2">
               <label className="text-sm font-bold text-slate-500 dark:text-slate-400 ml-1">
                 Category Name
               </label>
-              <Input 
+              <Input
                 value={editName}
                 onChange={(e) => setEditName(e.target.value)}
                 placeholder="Enter category name..."
@@ -267,16 +266,16 @@ export default function CategoryManagement() {
             </div>
 
             <DialogFooter className="flex flex-row gap-3 pt-4">
-              <Button 
-                type="button" 
-                variant="ghost" 
+              <Button
+                type="button"
+                variant="ghost"
                 onClick={() => setIsEditOpen(false)}
                 className="flex-1 h-12 rounded-xl gap-2 font-bold dark:text-slate-300"
               >
                 <X className="h-4 w-4" /> Cancel
               </Button>
-              <Button 
-                type="submit" 
+              <Button
+                type="submit"
                 disabled={updateMutation.isPending}
                 className="flex-1 h-12 rounded-xl bg-emerald-600 hover:bg-emerald-700 gap-2 font-bold shadow-lg shadow-emerald-500/20 text-white"
               >
