@@ -4,7 +4,7 @@ import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Menu } from "lucide-react";
-import Swal from "sweetalert2"; // Import SweetAlert2
+import Swal from "sweetalert2";
 
 import { cn } from "@/lib/utils";
 import { authClient } from "@/lib/auth-client";
@@ -46,7 +46,7 @@ interface User {
 const publicMenu: MenuItem[] = [
   { title: "Home", url: "/" },
   { title: "About", url: "/about" },
-  { title: "Shop", url: "/shop" }
+  { title: "Shop", url: "/shop" },
 ];
 
 /* -------------------- Role Based Menu -------------------- */
@@ -82,33 +82,48 @@ const Navbar = ({ className }: NavbarProps) => {
       text: "You will be logged out of your account!",
       icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
       confirmButtonText: "Yes, logout!",
-      background: "hsl(var(--background))", // Adapts to your shadcn theme
-      color: "hsl(var(--foreground))",
+      cancelButtonText: "Cancel",
+      
+      // FIX: Dynamically use your Shadcn/Tailwind OKLCH variables
+      background: "var(--background)", 
+      color: "var(--foreground)",
+      
+      // IMPORTANT: This prevents SWAL from using its default button styles
+      buttonsStyling: false, 
+      
+      customClass: {
+        popup: "rounded-lg border border-border shadow-xl",
+        title: "text-foreground font-bold",
+        htmlContainer: "text-muted-foreground",
+        // Using your theme's 'destructive' color for the confirm button
+        confirmButton: "bg-destructive text-white hover:opacity-90 px-5 py-2 rounded-md mx-2 font-medium transition-all",
+        // Using your theme's 'secondary' or 'outline' style for cancel
+        cancelButton: "bg-secondary text-secondary-foreground hover:bg-muted px-5 py-2 rounded-md mx-2 font-medium transition-all",
+      },
     });
 
     if (result.isConfirmed) {
       try {
         await authClient.signOut();
-
         Swal.fire({
           title: "Logged Out!",
-          text: "You have been successfully logged out.",
           icon: "success",
-          timer: 2000,
+          timer: 1500,
           showConfirmButton: false,
-          background: "hsl(var(--background))",
-          color: "hsl(var(--foreground))",
+          background: "var(--background)",
+          color: "var(--foreground)",
+          customClass: {
+            popup: "rounded-lg border border-border",
+          }
         });
       } catch (error) {
         Swal.fire({
           title: "Error!",
-          text: "Something went wrong. Please try again.",
+          text: "Try again later.",
           icon: "error",
-          background: "hsl(var(--background))",
-          color: "hsl(var(--foreground))",
+          background: "var(--background)",
+          color: "var(--foreground)",
         });
       }
     }
@@ -182,7 +197,7 @@ const Navbar = ({ className }: NavbarProps) => {
                 <Button asChild variant="outline" size="sm">
                   <Link href="/profile">Profile</Link>
                 </Button>
-                <Button size="sm" onClick={handleLogout}>
+                <Button size="sm" variant="destructive" onClick={handleLogout}>
                   Logout
                 </Button>
               </>
@@ -259,7 +274,9 @@ const Navbar = ({ className }: NavbarProps) => {
                         <Button asChild variant="outline">
                           <Link href="/profile">Profile</Link>
                         </Button>
-                        <Button onClick={handleLogout}>Logout</Button>
+                        <Button variant="destructive" onClick={handleLogout}>
+                          Logout
+                        </Button>
                       </>
                     )}
                   </div>

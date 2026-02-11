@@ -107,7 +107,7 @@ export default function ModernSellerDashboard() {
         doc.setFontSize(8);
         doc.setTextColor(150);
         doc.text(
-          "MedQuix - Confidential Inventory Report | Page " + data.pageCount,
+          "MedQuix - Confidential Inventory Report | Page " + data.pageNumber,
           14,
           doc.internal.pageSize.height - 10
         );
