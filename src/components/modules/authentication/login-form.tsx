@@ -33,11 +33,11 @@ export function LoginForm({
 
   const callbackUrl = searchParams.get("callbackUrl");
 
-  const handleQuickFill = (role: 'admin' | 'seller' | 'customer') => {
+  const handleQuickFill = (role: 'admin' | 'seller' | 'user') => {
     const credentials = {
-      admin: { email: "admin@example.com", pass: "admin123" },
-      seller: { email: "seller@example.com", pass: "seller123" },
-      customer: { email: "customer@example.com", pass: "Customer123" },
+      admin: { email: "admin@example.com", pass: "Admin123" },
+      seller: { email: "seller@example.com", pass: "Seller123" },
+      user: { email: "customer@example.com", pass: "Customer123" },
     };
     setEmail(credentials[role].email);
     setPassword(credentials[role].pass);
@@ -67,7 +67,7 @@ export function LoginForm({
       } else if (data.user?.role) {
         const role = data.user.role.toLowerCase();
         if (role === "seller") redirectUrl = "/seller/dashboard";
-        else if (role === "admin") redirectUrl = "/admin";
+        else if (role === "admin") redirectUrl = "/admin/dashboard";
       }
 
       router.push(redirectUrl);
@@ -92,7 +92,7 @@ export function LoginForm({
 
           {/* Quick Fill Roles */}
           <div className="grid grid-cols-3 gap-2">
-            <Button type="button" variant="outline" size="sm" onClick={() => handleQuickFill('customer')} className="text-xs">Customer</Button>
+            <Button type="button" variant="outline" size="sm" onClick={() => handleQuickFill('user')} className="text-xs">Customer</Button>
             <Button type="button" variant="outline" size="sm" onClick={() => handleQuickFill('seller')} className="text-xs">Seller</Button>
             <Button type="button" variant="outline" size="sm" onClick={() => handleQuickFill('admin')} className="text-xs">Admin</Button>
           </div>

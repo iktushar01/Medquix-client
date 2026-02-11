@@ -7,12 +7,16 @@ export async function proxy(request: NextRequest) {
 
   let isAuthenticated = false;
   let isAdmin = false;
+  let isSeller = false;
+  let isUser = false;
 
   const { data } = await userService.getSession();
 
   if (data) {
     isAuthenticated = true;
     isAdmin = data.user.role === Roles.admin;
+    isSeller = data.user.role === Roles.seller;
+    isUser = data.user.role === Roles.user;
   }
 
   //* User in not authenticated at all
@@ -20,16 +24,19 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  //* User is authenticated and role = ADMIN
-  //* User can not visit user dashboard
-  if (isAdmin && pathname.startsWith("/dashboard")) {
-    return NextResponse.redirect(new URL("/admin-dashboard", request.url));
-  }
-
   //* User is authenticated and role = USER
   //* User can not visit admin-dashboard
-  if (!isAdmin && pathname.startsWith("/admin-dashboard")) {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
+  if (!isAdmin && pathname.startsWith("/admin")) {
+    return NextResponse.redirect(new URL("/", request.url));
+  }
+  if (!isSeller && pathname.startsWith("/seller")) {
+    return NextResponse.redirect(new URL("/", request.url));
+  }
+  if (!isUser && pathname.startsWith("/cart")) {
+    return NextResponse.redirect(new URL("/", request.url));
+  }
+  if (!isUser && pathname.startsWith("/orders")) {
+    return NextResponse.redirect(new URL("/", request.url));
   }
 
   return NextResponse.next();
@@ -37,9 +44,10 @@ export async function proxy(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/dashboard",
-    "/dashboard/:path*",
-    "/admin-dashboard",
-    "/admin-dashboard/:path*",
+    "/admin/:path*",
+    "/seller/:path*",
+    "/user/:path*",
+    "/cart/:path*",
+    "/orders/:path*",
   ],
 };
