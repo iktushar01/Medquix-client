@@ -14,6 +14,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { authClient } from "@/lib/auth-client";
 import { handleGoogleLogin } from "@/lib/handleGoogleLogin";
+import { Eye, EyeOff, GalleryVerticalEnd } from "lucide-react";
+import Link from "next/link"; // Using Next.js Link for faster navigation
 
 export function LoginForm({
   className,
@@ -25,11 +27,21 @@ export function LoginForm({
 
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
+  const [showPassword, setShowPassword] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
 
-  // Get the callback URL from query params (e.g., /login?callbackUrl=/cart)
   const callbackUrl = searchParams.get("callbackUrl");
+
+  const handleQuickFill = (role: 'admin' | 'seller' | 'customer') => {
+    const credentials = {
+      admin: { email: "admin@example.com", pass: "admin123" },
+      seller: { email: "seller@example.com", pass: "seller123" },
+      customer: { email: "customer@example.com", pass: "customer123" },
+    };
+    setEmail(credentials[role].email);
+    setPassword(credentials[role].pass);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,54 +49,29 @@ export function LoginForm({
     setError(null);
 
     try {
-      const res = await fetch(
-        "http://localhost:5000/api/auth/sign-in/email",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-          body: JSON.stringify({
-            email,
-            password,
-          }),
-        }
-      );
+      const res = await fetch("http://localhost:5000/api/auth/sign-in/email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ email, password }),
+      });
 
       const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Login failed");
 
-      if (!res.ok) {
-        throw new Error(data.message || "Login failed");
-      }
-
-      console.log("Login success:", data);
-
-      // Refetch session data to get updated user info
       await session.refetch();
 
-      // Determine redirect URL based on callback or user role
       let redirectUrl = "/";
-
       if (callbackUrl) {
-        // If there's a callback URL, redirect there
         redirectUrl = callbackUrl;
       } else if (data.user?.role) {
-        // Otherwise, redirect based on user role
         const role = data.user.role.toLowerCase();
-        if (role === "seller") {
-          redirectUrl = "/seller/dashboard";
-        } else if (role === "admin") {
-          redirectUrl = "/admin";
-        } else {
-          // Default to home for regular users
-          redirectUrl = "/";
-        }
+        if (role === "seller") redirectUrl = "/seller/dashboard";
+        else if (role === "admin") redirectUrl = "/admin";
       }
 
-      // Navigate to the determined URL
       router.push(redirectUrl);
-      router.refresh(); // Refresh to update server components
+      router.refresh();
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -92,92 +79,84 @@ export function LoginForm({
     }
   };
 
-  console.log("session:", session);
-
   return (
-    <form
-      onSubmit={handleSubmit}
-      className={cn("flex flex-col gap-6", className)}
-      {...props}
-    >
-      <FieldGroup>
-        <div className="flex flex-col items-center gap-1 text-center">
-          <h1 className="text-2xl font-bold">Login to your account</h1>
-          <p className="text-muted-foreground text-sm text-balance">
-            Enter your email below to login to your account
-          </p>
-        </div>
-
-        <Field>
-          <FieldLabel htmlFor="email">Email</FieldLabel>
-          <Input
-            id="email"
-            type="email"
-            placeholder="m@example.com"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </Field>
-
-        <Field>
-          <div className="flex items-center">
-            <FieldLabel htmlFor="password">Password</FieldLabel>
-            <a
-              href="/forgot-password"
-              className="ml-auto text-sm underline-offset-4 hover:underline"
-            >
-              Forgot your password?
-            </a>
+    <div className={cn("flex flex-col gap-6", className)}>
+      <form onSubmit={handleSubmit} {...props}>
+        <FieldGroup>
+          <div className="flex flex-col items-center gap-2 text-center">
+            <h1 className="text-2xl font-bold">Welcome back</h1>
+            <p className="text-muted-foreground text-sm">
+              Use demo accounts or enter your details
+            </p>
           </div>
-          <Input
-            id="password"
-            type="password"
-            required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </Field>
 
-        {error && (
-          <p className="text-sm text-red-500 text-center">{error}</p>
-        )}
+          {/* Quick Fill Roles */}
+          <div className="grid grid-cols-3 gap-2">
+            <Button type="button" variant="outline" size="sm" onClick={() => handleQuickFill('customer')} className="text-xs">Customer</Button>
+            <Button type="button" variant="outline" size="sm" onClick={() => handleQuickFill('seller')} className="text-xs">Seller</Button>
+            <Button type="button" variant="outline" size="sm" onClick={() => handleQuickFill('admin')} className="text-xs">Admin</Button>
+          </div>
 
-        <Field>
-          <Button type="submit" disabled={loading}>
-            {loading ? "Logging in..." : "Login"}
-          </Button>
-        </Field>
+          <Field>
+            <FieldLabel htmlFor="email">Email</FieldLabel>
+            <Input
+              id="email"
+              type="email"
+              placeholder="name@example.com"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </Field>
 
-        <FieldSeparator>Or continue with</FieldSeparator>
-
-        <Field>
-          <Button
-            onClick={handleGoogleLogin}
-            variant="outline"
-            type="button"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              className="mr-2 h-4 w-4"
-            >
-              <path
-                d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"
-                fill="currentColor"
+          <Field>
+            <div className="flex items-center">
+              <FieldLabel htmlFor="password">Password</FieldLabel>
+              <Link href="/forgot-password" className="ml-auto text-sm underline-offset-4 hover:underline">
+                Forgot?
+              </Link>
+            </div>
+            <div className="relative">
+              <Input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                required
+                className="pr-10"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
               />
-            </svg>
-            Login with Google
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              >
+                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
+            </div>
+          </Field>
+
+          {error && <p className="text-xs font-medium text-destructive text-center">{error}</p>}
+
+          <Button type="submit" disabled={loading} className="w-full">
+            {loading ? "Signing in..." : "Login"}
           </Button>
 
-          <FieldDescription className="text-center">
-            Don&apos;t have an account?{" "}
-            <a href="/signup" className="underline underline-offset-4">
-              Sign up
-            </a>
-          </FieldDescription>
-        </Field>
-      </FieldGroup>
-    </form>
+          <FieldSeparator>Or continue with</FieldSeparator>
+
+          <Button onClick={handleGoogleLogin} variant="outline" type="button" className="w-full">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="mr-2 h-4 w-4"><path d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z" fill="currentColor"/></svg>
+            Google
+          </Button>
+        </FieldGroup>
+      </form>
+
+      {/* Register Section */}
+      <div className="text-center text-sm">
+        Don&apos;t have an account?{" "}
+        <Link href="/signup" className="font-semibold text-primary underline-offset-4 hover:underline">
+          Create an account
+        </Link>
+      </div>
+    </div>
   );
 }
