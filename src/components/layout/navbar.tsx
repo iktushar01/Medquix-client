@@ -45,6 +45,7 @@ interface User {
 /* -------------------- Public Menu -------------------- */
 const publicMenu: MenuItem[] = [
   { title: "Home", url: "/" },
+  { title: "About", url: "/about" },
   { title: "Shop", url: "/shop" }
 ];
 
