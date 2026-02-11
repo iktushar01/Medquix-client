@@ -37,7 +37,7 @@ export function LoginForm({
     const credentials = {
       admin: { email: "admin@example.com", pass: "admin123" },
       seller: { email: "seller@example.com", pass: "seller123" },
-      customer: { email: "customer@example.com", pass: "customer123" },
+      customer: { email: "customer@example.com", pass: "Customer123" },
     };
     setEmail(credentials[role].email);
     setPassword(credentials[role].pass);
