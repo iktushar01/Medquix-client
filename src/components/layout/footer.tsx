@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import Image from "next/image";
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -27,13 +28,14 @@ export default function Footer() {
         {/* 1. TOP SECTION: BRAND & NEWSLETTER */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-16">
           <div className="lg:col-span-4 space-y-6">
-            <Link href="/" className="flex items-center gap-2 group">
-              <div className="h-10 w-10 bg-emerald-600 rounded-xl flex items-center justify-center transition-transform group-hover:rotate-12">
-                <Pill className="text-white h-6 w-6" />
-              </div>
-              <span className="text-2xl font-black tracking-tighter text-slate-900 dark:text-white">
-                Med<span className="text-emerald-600">Quix</span>
-              </span>
+            <Link href="/">
+              <Image
+                src="https://i.postimg.cc/Bv1xhwD0/logo.png"
+                alt="MedQuix Logo"
+                width={80}
+                height={20}
+                priority
+              />
             </Link>
             <p className="text-slate-600 dark:text-slate-400 leading-relaxed max-w-sm">
               Your trusted partner in healthcare. Providing safe, reliable, and fast
