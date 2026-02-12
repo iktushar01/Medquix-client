@@ -95,15 +95,14 @@ export default function MedicineDetailPage() {
   const images: IImage[] = medicine.images?.length > 0 ? medicine.images : [{ id: 0, imageUrl: "/placeholder-medicine.png" }];
 
   return (
-    <div className="min-h-screen bg-white dark:bg-zinc-950">
+    <div className="min-h-screen bg-background">
       <div className="container mx-auto px-6 py-8 lg:py-16 max-w-6xl">
-
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 mb-24">
 
-          {/* LEFT: IMAGES - Minimalist framing */}
+          {/* LEFT: IMAGES - Clean medical framing */}
           <div className="lg:col-span-7 space-y-4">
-            <div className="relative aspect-[4/3] overflow-hidden rounded-xl bg-zinc-50 dark:bg-zinc-900 flex items-center justify-center border border-zinc-100 dark:border-zinc-800">
+            <div className="relative aspect-[4/3] overflow-hidden rounded-xl bg-muted flex items-center justify-center border border-border">
               <Image
                 src={images[activeImg].imageUrl}
                 alt={medicine.name}
@@ -119,7 +118,9 @@ export default function MedicineDetailPage() {
                   onClick={() => setActiveImg(idx)}
                   className={cn(
                     "relative h-20 w-20 flex-shrink-0 rounded-lg border transition-all duration-200",
-                    activeImg === idx ? "border-zinc-900 ring-1 ring-zinc-900" : "border-zinc-200 opacity-60 hover:opacity-100"
+                    activeImg === idx 
+                      ? "border-primary ring-2 ring-primary/20" 
+                      : "border-border opacity-60 hover:opacity-100 hover:border-primary/50"
                   )}
                 >
                   <Image src={img.imageUrl} alt="thumb" fill className="object-cover rounded-md p-1" />
@@ -128,40 +129,49 @@ export default function MedicineDetailPage() {
             </div>
           </div>
 
-          {/* RIGHT: CONTENT - Focus on Typography */}
+          {/* RIGHT: CONTENT - Medical professional design */}
           <div className="lg:col-span-5 flex flex-col">
             <div className="mb-8">
-              <p className="text-xs font-bold tracking-[0.2em] text-blue-600 uppercase mb-3">{medicine.manufacturer}</p>
-              <h1 className="text-4xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50 mb-4">{medicine.name}</h1>
+              <p className="text-xs font-bold tracking-[0.2em] text-primary uppercase mb-3">
+                {medicine.manufacturer}
+              </p>
+              <h1 className="text-4xl font-semibold tracking-tight text-foreground mb-4">
+                {medicine.name}
+              </h1>
 
               <div className="flex items-center gap-4">
-                <span className="text-3xl font-light text-zinc-900 dark:text-zinc-50">৳{medicine.price}</span>
-                <Badge variant="outline" className={cn(
-                  "font-medium border-none rounded-full px-3",
-                  medicine.stock > 0 ? "bg-emerald-50 text-emerald-600" : "bg-red-50 text-red-600"
-                )}>
+                <span className="text-3xl font-light text-foreground">৳{medicine.price}</span>
+                <Badge 
+                  variant="outline" 
+                  className={cn(
+                    "font-medium border-none rounded-full px-3",
+                    medicine.stock > 0 
+                      ? "bg-primary/10 text-primary" 
+                      : "bg-destructive/10 text-destructive"
+                  )}
+                >
                   {medicine.stock > 0 ? `In Stock (${medicine.stock})` : "Out of Stock"}
                 </Badge>
               </div>
             </div>
 
-            <p className="text-zinc-500 dark:text-zinc-400 leading-relaxed mb-8 text-sm lg:text-base">
+            <p className="text-muted-foreground leading-relaxed mb-8 text-sm lg:text-base">
               {medicine.description}
             </p>
 
             <div className="space-y-6">
               <div className="flex items-center gap-4">
-                <div className="flex items-center border border-zinc-200 dark:border-zinc-800 rounded-lg h-12">
+                <div className="flex items-center border border-border rounded-lg h-12 bg-card">
                   <button
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    className="px-4 text-zinc-500 hover:text-zinc-900"
+                    className="px-4 text-muted-foreground hover:text-foreground transition-colors"
                   >
                     <Minus className="h-4 w-4" />
                   </button>
-                  <span className="w-8 text-center font-medium tabular-nums">{quantity}</span>
+                  <span className="w-8 text-center font-medium tabular-nums text-foreground">{quantity}</span>
                   <button
                     onClick={() => setQuantity(Math.min(medicine.stock, quantity + 1))}
-                    className="px-4 text-zinc-500 hover:text-zinc-900"
+                    className="px-4 text-muted-foreground hover:text-foreground transition-colors"
                   >
                     <Plus className="h-4 w-4" />
                   </button>
@@ -170,29 +180,52 @@ export default function MedicineDetailPage() {
                 <Button
                   onClick={() => addToCart()}
                   disabled={medicine.stock === 0 || isPending}
-                  className="h-12 flex-1 bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-zinc-50 dark:hover:bg-zinc-200 dark:text-zinc-950 transition-all"
+                  className="h-12 flex-1 bg-primary hover:bg-primary/90 text-primary-foreground transition-all shadow-md hover:shadow-lg"
                 >
+                  <ShoppingCart className="h-4 w-4 mr-2" />
                   {isPending ? "Adding..." : "Add to Cart"}
                 </Button>
               </div>
 
-              <div className="grid grid-cols-2 gap-px bg-zinc-100 dark:bg-zinc-800 border border-zinc-100 dark:border-zinc-800 rounded-xl overflow-hidden">
-                <QuickSpec icon={<ShieldCheck />} label="Expiry" value={new Date(medicine.expiryDate).toLocaleDateString(undefined, { month: 'short', year: 'numeric' })} />
-                <QuickSpec icon={<Truck />} label="Delivery" value="Free Over ৳500" />
-                <QuickSpec icon={<BadgeCheck />} label="Product" value="100% Original" />
-                <QuickSpec icon={<RotateCcw />} label="Returns" value="7 Days Policy" />
+              <div className="grid grid-cols-2 gap-px bg-border rounded-xl overflow-hidden">
+                <QuickSpec 
+                  icon={<ShieldCheck />} 
+                  label="Expiry" 
+                  value={new Date(medicine.expiryDate).toLocaleDateString(undefined, { month: 'short', year: 'numeric' })} 
+                />
+                <QuickSpec 
+                  icon={<Truck />} 
+                  label="Delivery" 
+                  value="Free Over ৳500" 
+                />
+                <QuickSpec 
+                  icon={<BadgeCheck />} 
+                  label="Product" 
+                  value="100% Original" 
+                />
+                <QuickSpec 
+                  icon={<RotateCcw />} 
+                  label="Returns" 
+                  value="7 Days Policy" 
+                />
               </div>
             </div>
           </div>
         </div>
 
-        {/* TABS - Refined Border Style */}
+        {/* TABS - Medical professional style */}
         <Tabs defaultValue="description" className="w-full">
-          <TabsList className="bg-transparent border-b rounded-none h-auto p-0 mb-12 w-full justify-start gap-8">
-            <TabsTrigger value="description" className="rounded-none border-b-2 border-transparent data-[state=active]:border-zinc-900 data-[state=active]:bg-transparent bg-transparent px-0 pb-4 text-sm font-semibold uppercase tracking-wider">
+          <TabsList className="bg-transparent border-b border-border rounded-none h-auto p-0 mb-12 w-full justify-start gap-8">
+            <TabsTrigger 
+              value="description" 
+              className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary bg-transparent px-0 pb-4 text-sm font-semibold uppercase tracking-wider text-muted-foreground"
+            >
               Product Info
             </TabsTrigger>
-            <TabsTrigger value="reviews" className="rounded-none border-b-2 border-transparent data-[state=active]:border-zinc-900 data-[state=active]:bg-transparent bg-transparent px-0 pb-4 text-sm font-semibold uppercase tracking-wider">
+            <TabsTrigger 
+              value="reviews" 
+              className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary bg-transparent px-0 pb-4 text-sm font-semibold uppercase tracking-wider text-muted-foreground"
+            >
               Reviews ({reviews.length})
             </TabsTrigger>
           </TabsList>
@@ -200,19 +233,19 @@ export default function MedicineDetailPage() {
           <TabsContent value="description" className="animate-in fade-in duration-500">
             <div className="grid md:grid-cols-12 gap-12">
               <div className="md:col-span-8">
-                <h3 className="text-xl font-semibold mb-4 text-zinc-900 dark:text-zinc-50">Detailed Pharmacology</h3>
-                <div className="prose prose-zinc dark:prose-invert max-w-none text-zinc-500 text-sm leading-loose">
+                <h3 className="text-xl font-semibold mb-4 text-foreground">Detailed Pharmacology</h3>
+                <div className="prose prose-slate dark:prose-invert max-w-none text-muted-foreground text-sm leading-loose">
                   {medicine.description}
                 </div>
               </div>
               <div className="md:col-span-4 space-y-4">
-                <div className="p-5 rounded-xl border border-zinc-100 dark:border-zinc-900 bg-zinc-50/50 dark:bg-zinc-900/50">
-                  <p className="text-[10px] font-bold uppercase text-zinc-400 mb-1">Manufacturer</p>
-                  <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">{medicine.manufacturer}</p>
+                <div className="p-5 rounded-xl border border-border bg-accent/50">
+                  <p className="text-[10px] font-bold uppercase text-muted-foreground mb-1">Manufacturer</p>
+                  <p className="text-sm font-medium text-foreground">{medicine.manufacturer}</p>
                 </div>
-                <div className="p-5 rounded-xl border border-zinc-100 dark:border-zinc-900">
-                  <p className="text-[10px] font-bold uppercase text-zinc-400 mb-1">Category</p>
-                  <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">{medicine.category.name}</p>
+                <div className="p-5 rounded-xl border border-border bg-card">
+                  <p className="text-[10px] font-bold uppercase text-muted-foreground mb-1">Category</p>
+                  <p className="text-sm font-medium text-foreground">{medicine.category.name}</p>
                 </div>
               </div>
             </div>
@@ -221,39 +254,49 @@ export default function MedicineDetailPage() {
           <TabsContent value="reviews" className="animate-in fade-in duration-500">
             <div className="max-w-2xl space-y-10">
               <div className="flex items-center justify-between">
-                <h3 className="text-xl font-semibold">Community Reviews</h3>
-                <div className="flex items-center gap-1.5 font-medium">
+                <h3 className="text-xl font-semibold text-foreground">Community Reviews</h3>
+                <div className="flex items-center gap-1.5 font-medium text-foreground">
                   <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                   <span>{reviewsData?.averageRating || "0.0"}</span>
-                  <span className="text-zinc-400 text-sm">({reviews.length} reviews)</span>
+                  <span className="text-muted-foreground text-sm">({reviews.length} reviews)</span>
                 </div>
               </div>
 
               {reviews.length === 0 ? (
-                <div className="text-center py-16 bg-zinc-50 dark:bg-zinc-900/50 rounded-xl border border-dashed border-zinc-200 dark:border-zinc-800">
-                  <p className="text-zinc-500 text-sm">No reviews yet for this product.</p>
+                <div className="text-center py-16 bg-muted rounded-xl border border-dashed border-border">
+                  <p className="text-muted-foreground text-sm">No reviews yet for this product.</p>
                 </div>
               ) : (
-                <div className="divide-y divide-zinc-100 dark:divide-zinc-800">
+                <div className="divide-y divide-border">
                   {reviews.map((review: IReview) => (
                     <div key={review.id} className="py-8 first:pt-0">
                       <div className="flex gap-4">
-                        <Avatar className="h-10 w-10">
-                          <AvatarFallback className="bg-zinc-100 dark:bg-zinc-800 text-zinc-600 text-xs">
+                        <Avatar className="h-10 w-10 border border-border">
+                          <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">
                             {review.user?.name?.charAt(0) || "U"}
                           </AvatarFallback>
                         </Avatar>
                         <div className="flex-1">
                           <div className="flex justify-between items-center mb-2">
-                            <h4 className="text-sm font-semibold">{review.user?.name || "Verified Buyer"}</h4>
-                            <span className="text-[10px] text-zinc-400">{new Date(review.createdAt).toLocaleDateString()}</span>
+                            <h4 className="text-sm font-semibold text-foreground">{review.user?.name || "Verified Buyer"}</h4>
+                            <span className="text-[10px] text-muted-foreground">
+                              {new Date(review.createdAt).toLocaleDateString()}
+                            </span>
                           </div>
                           <div className="flex gap-0.5 mb-3">
                             {[...Array(5)].map((_, i) => (
-                              <Star key={i} className={cn("h-3 w-3", i < review.rating ? "fill-zinc-900 text-zinc-900 dark:fill-zinc-50 dark:text-zinc-50" : "text-zinc-200 dark:text-zinc-800")} />
+                              <Star 
+                                key={i} 
+                                className={cn(
+                                  "h-3 w-3", 
+                                  i < review.rating 
+                                    ? "fill-primary text-primary" 
+                                    : "text-border"
+                                )} 
+                              />
                             ))}
                           </div>
-                          <p className="text-zinc-600 dark:text-zinc-400 text-sm leading-relaxed">{review.comment}</p>
+                          <p className="text-muted-foreground text-sm leading-relaxed">{review.comment}</p>
                         </div>
                       </div>
                     </div>
@@ -270,10 +313,10 @@ export default function MedicineDetailPage() {
 
 function QuickSpec({ icon, label, value }: { icon: any, label: string, value: string }) {
   return (
-    <div className="bg-white dark:bg-zinc-950 p-4 flex flex-col gap-1">
-      <div className="text-zinc-400">{React.cloneElement(icon, { className: "h-4 w-4" })}</div>
-      <p className="text-[10px] font-bold uppercase text-zinc-400 tracking-tight">{label}</p>
-      <p className="text-xs font-semibold text-zinc-900 dark:text-zinc-100">{value}</p>
+    <div className="bg-card p-4 flex flex-col gap-1">
+      <div className="text-primary">{React.cloneElement(icon, { className: "h-4 w-4" })}</div>
+      <p className="text-[10px] font-bold uppercase text-muted-foreground tracking-tight">{label}</p>
+      <p className="text-xs font-semibold text-foreground">{value}</p>
     </div>
   );
 }
