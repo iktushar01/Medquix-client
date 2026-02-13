@@ -1,14 +1,19 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { auth } from "@better-auth/next"; // Better Auth middleware helper
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Get session
-  const session = await auth.api.getSession({
-    headers: request.headers,
+  const res = await fetch(`${process.env.AUTH_URL}/get-session`, {
+    headers: {
+      cookie: request.headers.get("cookie") || "",
+    },
+    cache: "no-store",
   });
+
+  const sessionData = await res.json();
+  const session = sessionData?.data || sessionData;
 
   const user = session?.user;
   const role = user?.role; // "customer" | "seller" | "admin"
