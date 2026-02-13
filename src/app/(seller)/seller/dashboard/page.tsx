@@ -30,7 +30,7 @@ export default function ModernSellerDashboard() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api"}/medicines`);
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/medicines`);
         const result = await res.json();
         if (result.success) setMedicines(result.data);
       } catch (err) {

@@ -2,15 +2,15 @@
 
 import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import api from "@/lib/axios"; 
+import api from "@/lib/axios";
 import Loading from "@/app/loading";
 import Swal from "sweetalert2";
-import { 
-  Users, 
-  Mail, 
-  ShieldCheck, 
-  UserCircle, 
-  Search, 
+import {
+  Users,
+  Mail,
+  ShieldCheck,
+  UserCircle,
+  Search,
   MoreHorizontal,
   Ban,
   CheckCircle,
@@ -21,21 +21,21 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
 } from "@/components/ui/table";
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuLabel, 
-  DropdownMenuSeparator, 
-  DropdownMenuTrigger 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 
 /* -------------------- Types -------------------- */
@@ -64,18 +64,18 @@ export default function AdminUsersPage() {
   // 2. Toggle Status Mutation (BANNED/ACTIVE)
   const { mutate: updateStatus } = useMutation({
     mutationFn: async ({ userId, status }: { userId: string; status: string }) => {
-      // Endpoint: PATCH http://localhost:5000/api/admin/users/:id
+      // Endpoint: PATCH /admin/users/:id
       const res = await api.patch(`/admin/users/${userId}`, { status });
       return res.data;
     },
     onSuccess: () => {
-      Swal.fire({ 
-        title: "Status Updated", 
-        icon: "success", 
-        toast: true, 
-        position: "top-end", 
-        timer: 2000, 
-        showConfirmButton: false 
+      Swal.fire({
+        title: "Status Updated",
+        icon: "success",
+        toast: true,
+        position: "top-end",
+        timer: 2000,
+        showConfirmButton: false
       });
       queryClient.invalidateQueries({ queryKey: ["admin-users"] });
     },
@@ -90,8 +90,8 @@ export default function AdminUsersPage() {
 
     Swal.fire({
       title: isBanning ? "Ban User?" : "Unban User?",
-      text: isBanning 
-        ? "This user will no longer be able to log in or use the platform." 
+      text: isBanning
+        ? "This user will no longer be able to log in or use the platform."
         : "This user will regain access to their account.",
       icon: isBanning ? "warning" : "question",
       showCancelButton: true,
@@ -107,14 +107,14 @@ export default function AdminUsersPage() {
 
   if (isLoading) return <Loading />;
 
-  const filteredUsers = users?.filter(user => 
+  const filteredUsers = users?.filter(user =>
     user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     user.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
     <div className="min-h-screen bg-slate-50/50 dark:bg-transparent p-4 lg:p-8 space-y-8">
-      
+
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white dark:bg-slate-900 p-6 rounded-2xl border shadow-sm">
         <div>
@@ -126,8 +126,8 @@ export default function AdminUsersPage() {
 
         <div className="relative w-full md:w-80">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-          <Input 
-            placeholder="Search name or email..." 
+          <Input
+            placeholder="Search name or email..."
             className="pl-10 h-11 ring-offset-transparent focus-visible:ring-1"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -153,9 +153,8 @@ export default function AdminUsersPage() {
                 <TableRow key={user.id} className={`${user.status === "BANNED" ? "bg-red-50/30 dark:bg-red-900/5" : ""}`}>
                   <TableCell>
                     <div className="flex items-center gap-3">
-                      <div className={`h-10 w-10 rounded-full flex items-center justify-center font-bold ${
-                        user.status === "BANNED" ? "bg-slate-200 text-slate-500" : "bg-primary/10 text-primary"
-                      }`}>
+                      <div className={`h-10 w-10 rounded-full flex items-center justify-center font-bold ${user.status === "BANNED" ? "bg-slate-200 text-slate-500" : "bg-primary/10 text-primary"
+                        }`}>
                         {user.name.charAt(0)}
                       </div>
                       <div className="flex flex-col">
@@ -164,19 +163,19 @@ export default function AdminUsersPage() {
                       </div>
                     </div>
                   </TableCell>
-                  
+
                   <TableCell>
                     <RoleBadge role={user.role} />
                   </TableCell>
-                  
+
                   <TableCell>
                     <StatusIndicator status={user.status} />
                   </TableCell>
-                  
+
                   <TableCell className="text-sm text-slate-500">
                     {new Date(user.createdAt).toLocaleDateString()}
                   </TableCell>
-                  
+
                   <TableCell className="text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -190,10 +189,9 @@ export default function AdminUsersPage() {
                         <DropdownMenuItem className="gap-2 cursor-pointer">
                           <UserCog className="h-4 w-4" /> Edit Profile
                         </DropdownMenuItem>
-                        <DropdownMenuItem 
-                          className={`gap-2 cursor-pointer font-medium ${
-                            user.status === "ACTIVE" ? "text-red-600 focus:text-red-600" : "text-emerald-600 focus:text-emerald-600"
-                          }`}
+                        <DropdownMenuItem
+                          className={`gap-2 cursor-pointer font-medium ${user.status === "ACTIVE" ? "text-red-600 focus:text-red-600" : "text-emerald-600 focus:text-emerald-600"
+                            }`}
                           onClick={() => handleStatusChange(user.id, user.status)}
                         >
                           {user.status === "ACTIVE" ? (

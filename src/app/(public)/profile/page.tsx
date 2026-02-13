@@ -39,7 +39,7 @@ export default function ProfilePage() {
     const fetchProfile = async () => {
       try {
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api"}/profile`,
+          `${process.env.NEXT_PUBLIC_API_URL || ""}/profile`,
           {
             method: "GET",
             credentials: "include",
@@ -91,7 +91,7 @@ export default function ProfilePage() {
             <div className="group relative bg-card/80 backdrop-blur-xl rounded-3xl p-8 border border-border shadow-lg hover:shadow-xl transition-all duration-300">
               {/* Gradient Border Effect */}
               <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-accent/20 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10 blur-xl" />
-              
+
               <div className="relative">
                 {/* Avatar */}
                 <div className="relative w-32 h-32 mx-auto mb-6">
@@ -144,7 +144,7 @@ export default function ProfilePage() {
                 window.location.href = "/login";
               }}
             >
-              <LogOut className="h-5 w-5" /> 
+              <LogOut className="h-5 w-5" />
               <span className="font-semibold">Logout</span>
             </Button>
           </div>
@@ -153,9 +153,9 @@ export default function ProfilePage() {
           <div className="lg:col-span-8 space-y-6">
             {/* Info Grid */}
             <div className="grid sm:grid-cols-2 gap-4">
-              <InfoTile 
-                icon={<Mail className="h-5 w-5 text-primary" />} 
-                label="Email" 
+              <InfoTile
+                icon={<Mail className="h-5 w-5 text-primary" />}
+                label="Email"
                 value={profile.email}
                 gradient="from-primary/20 to-primary/5"
               />
@@ -176,11 +176,11 @@ export default function ProfilePage() {
                 label="Member Since"
                 value={
                   profile.createdAt
-                    ? new Date(profile.createdAt).toLocaleDateString('en-US', { 
-                        month: 'short', 
-                        day: 'numeric',
-                        year: 'numeric' 
-                      })
+                    ? new Date(profile.createdAt).toLocaleDateString('en-US', {
+                      month: 'short',
+                      day: 'numeric',
+                      year: 'numeric'
+                    })
                     : "—"
                 }
                 gradient="from-accent/20 to-accent/5"
@@ -200,7 +200,7 @@ function InfoTile({ icon, label, value, gradient }: any) {
   return (
     <div className="group relative bg-card/80 backdrop-blur-xl p-6 rounded-2xl border border-border hover:border-primary/30 transition-all duration-300 overflow-hidden">
       <div className={`absolute inset-0 bg-gradient-to-br ${gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
-      
+
       <div className="relative">
         <div className="mb-3 p-2 bg-background/50 rounded-xl w-fit">
           {icon}
@@ -254,7 +254,7 @@ function ErrorState() {
         <p className="text-muted-foreground mb-6">
           Your session has expired. Please log in again to continue.
         </p>
-        <Button 
+        <Button
           onClick={() => (window.location.href = "/login")}
           className="bg-primary text-primary-foreground hover:bg-primary/90 h-12 px-8 rounded-xl font-semibold"
         >
