@@ -23,6 +23,7 @@ interface FormData {
   confirmPassword: string;
   phone: string;
   image: string;
+  role: "user" | "seller"; // Added role type
 }
 
 interface FormErrors {
@@ -40,6 +41,7 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"form">
     confirmPassword: "",
     phone: "",
     image: "",
+    role: "user", // Default role
   });
   
   const [errors, setErrors] = useState<FormErrors>({});
@@ -47,7 +49,6 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"form">
   const [imageUploading, setImageUploading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  // Helper for quick testing
   const handleQuickFill = () => {
     setFormData({
       name: "Test User",
@@ -56,6 +57,7 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"form">
       confirmPassword: "Password123",
       phone: "01712345678",
       image: "",
+      role: "user",
     });
   };
 
@@ -70,12 +72,13 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"form">
       formData.email.trim() &&
       formData.password.length >= 6 &&
       passwordsMatch &&
-      formData.phone.trim()
+      formData.phone.trim() &&
+      formData.role // Ensure role is selected
     );
   }, [formData, passwordsMatch]);
 
   const handleInputChange = useCallback(
-    (field: keyof FormData) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    (field: keyof FormData) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
       setFormData((prev) => ({ ...prev, [field]: e.target.value }));
       if (errors[field as keyof FormErrors]) {
         setErrors((prev) => ({ ...prev, [field]: undefined }));
@@ -121,6 +124,7 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"form">
     setLoading(true);
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/sign-up/email`, {
+        // ... rest of your fetch logic
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -173,13 +177,32 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"form">
             </div>
           )}
 
-          <Field>
-            <FieldLabel>Profile Image</FieldLabel>
-            <Input type="file" accept="image/*" onChange={handleImageChange} disabled={imageUploading || loading} />
-            <FieldDescription className="text-[10px]">
-              {imageUploading ? "Uploading..." : formData.image ? "Uploaded ✓" : "Max 5MB"}
-            </FieldDescription>
-          </Field>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+             {/* Role Selection Dropdown */}
+            <Field>
+              <FieldLabel htmlFor="role">I want to register as</FieldLabel>
+              <select
+                id="role"
+                value={formData.role}
+                onChange={handleInputChange("role")}
+                disabled={loading}
+                className={cn(
+                  "flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                )}
+              >
+                <option value="user">Customer</option>
+                <option value="seller">Seller</option>
+              </select>
+            </Field>
+
+            <Field>
+              <FieldLabel>Profile Image</FieldLabel>
+              <Input type="file" accept="image/*" onChange={handleImageChange} disabled={imageUploading || loading} />
+              <FieldDescription className="text-[10px]">
+                {imageUploading ? "Uploading..." : formData.image ? "Uploaded ✓" : "Max 5MB"}
+              </FieldDescription>
+            </Field>
+          </div>
 
           <Field>
             <FieldLabel htmlFor="name">Full Name</FieldLabel>
