@@ -5,7 +5,8 @@ export const handleGoogleLogin = async () => {
   try {
     await authClient.signIn.social({
       provider: "google",
-      callbackURL: "http://localhost:3000",
+      callbackURL: process.env.NEXT_PUBLIC_BASE_URL,
+      
     });
   } catch (error) {
     console.error("Google login failed:", error);
