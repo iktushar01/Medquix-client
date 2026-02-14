@@ -36,9 +36,13 @@ async function proxyRequest(request: NextRequest) {
     const headersToSkip = ["host", "connection", "content-length"];
     request.headers.forEach((value, key) => {
         if (!headersToSkip.includes(key.toLowerCase())) {
-            // Re-prefix cookies when forwarding to backend if they were de-prefixed on localhost
-            if (key.toLowerCase() === "cookie" && url.hostname === "localhost") {
-                const newValue = value.replace(/better-auth\.session_token=/g, "__Secure-better-auth.session_token=");
+            // Re-prefix cookies when forwarding to backend if they were de-prefixed correctly in browser
+            // Better-auth production REQUIRES __Secure- prefix on HTTPS
+            if (key.toLowerCase() === "cookie") {
+                let newValue = value;
+                if (!value.includes("__Secure-better-auth.session_token") && (backendUrl.startsWith("https") || url.hostname === "localhost")) {
+                    newValue = value.replace(/better-auth\.session_token=/g, "__Secure-better-auth.session_token=");
+                }
                 headers.set(key, newValue);
             } else {
                 headers.set(key, value);

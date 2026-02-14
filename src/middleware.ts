@@ -8,10 +8,10 @@ export async function middleware(request: NextRequest) {
     const protectedRoutes = [
         { path: "/admin", roles: ["admin"] },
         { path: "/seller", roles: ["seller"] },
-        { path: "/profile", roles: [ "seller", "admin", "user"] },
+        { path: "/profile", roles: ["seller", "admin", "user"] },
         { path: "/orders", roles: ["seller", "admin", "user"] },
-        { path: "/cart", roles: [ "seller", "admin", "user"] },
-        { path: "/checkout", roles: [ "seller", "admin", "user"] },
+        { path: "/cart", roles: ["seller", "admin", "user"] },
+        { path: "/checkout", roles: ["seller", "admin", "user"] },
     ];
 
     const currentRoute = protectedRoutes.find(route => pathname.startsWith(route.path));
@@ -24,15 +24,22 @@ export async function middleware(request: NextRequest) {
     const backendBaseUrl = (process.env.BACKEND_URL || "https://medquix-server.vercel.app").replace(/\/$/, "");
     const sessionUrl = `${backendBaseUrl}/api/auth/get-session`;
 
-    // Cookie re-prefixing for backend
+    // Robust cookie re-prefixing for backend
+    // In production (HTTPS), better-auth REQUIRES __Secure- prefix
     let cookie = request.headers.get("cookie") || "";
-    if (request.nextUrl.hostname === "localhost") {
+    if (cookie && !cookie.includes("__Secure-better-auth.session_token") && (backendBaseUrl.startsWith("https") || request.nextUrl.hostname === "localhost")) {
         cookie = cookie.replace(/better-auth\.session_token=/g, "__Secure-better-auth.session_token=");
+        console.log(`Middleware: Reprefixed cookie for backend ${backendBaseUrl}`);
     }
 
     try {
         const res = await fetch(sessionUrl, {
-            headers: { cookie },
+            headers: {
+                cookie,
+                "User-Agent": request.headers.get("User-Agent") || "",
+                "Origin": request.headers.get("Origin") || "",
+                "Referer": request.headers.get("Referer") || "",
+            },
             cache: "no-store",
         });
 
@@ -43,13 +50,13 @@ export async function middleware(request: NextRequest) {
 
         // 1. Not logged in
         if (!user) {
-            console.log(`Middleware: No session for ${pathname}, redirecting to /login`);
+            console.log(`Middleware: Session verification failed for ${pathname} (User: ${!!user}), redirecting to /login`);
             return NextResponse.redirect(new URL("/login", request.url));
         }
 
         // 2. Logged in but wrong role
         if (!currentRoute.roles.includes(role)) {
-            console.log(`Middleware: Role ${role} unauthorized for ${pathname}, redirecting to /`);
+            console.log(`Middleware: Role '${role}' unauthorized for ${pathname}, redirecting to /`);
             return NextResponse.redirect(new URL("/", request.url));
         }
 
@@ -57,8 +64,6 @@ export async function middleware(request: NextRequest) {
         return NextResponse.next();
     } catch (error) {
         console.error("Middleware session check failed:", error);
-        // On error, let the request through or redirect to login? 
-        // Usually safer to redirect to login if we can't verify session on protected routes
         return NextResponse.redirect(new URL("/login", request.url));
     }
 }
