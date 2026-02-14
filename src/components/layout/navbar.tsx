@@ -226,9 +226,7 @@ const Navbar = ({ className }: NavbarProps) => {
               </SheetTrigger>
 
               <SheetContent className="overflow-y-auto">
-                <SheetHeader>
-                  <SheetTitle>MedQuix 💊</SheetTitle>
-                </SheetHeader>
+                
 
                 <div className="flex flex-col gap-6 p-4">
                   <Accordion type="single" collapsible>
