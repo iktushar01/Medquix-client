@@ -94,24 +94,7 @@ interface Order {
   orderItems: OrderItem[];
 }
 
-// --- Auth Helper ---
-const getAuthToken = () => {
-  if (typeof window === "undefined") return "";
-  const possibleKeys = ["better-auth.session_data", "better-auth.session-token", "session", "auth_token"];
-  for (const key of possibleKeys) {
-    const data = localStorage.getItem(key);
-    if (!data) continue;
-    try {
-      const parsed = JSON.parse(data);
-      const token = parsed.session?.token || parsed.token || parsed.sessionToken || (typeof parsed === 'string' ? parsed : "");
-      if (token) return token;
-    } catch (e) {
-      if (data.length > 20) return data;
-    }
-  }
-  return "";
-};
-
+// --- Orders Page ---
 export default function MyOrdersPage() {
   const queryClient = useQueryClient();
   const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -125,20 +108,18 @@ export default function MyOrdersPage() {
   const { data: orders, isLoading, error } = useQuery<Order[]>({
     queryKey: ["orders"],
     queryFn: async () => {
-      const token = getAuthToken();
       const response = await fetch(`${BASE_URL}/orders`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          ...(token && { "Authorization": `Bearer ${token}` }),
         },
         credentials: "include",
       });
 
       if (response.status === 401) throw new Error("UNAUTHORIZED");
       if (!response.ok) {
-          const errData = await response.json().catch(() => ({}));
-          throw new Error(errData.message || "FETCH_FAILED");
+        const errData = await response.json().catch(() => ({}));
+        throw new Error(errData.message || "FETCH_FAILED");
       }
 
       const result = await response.json();
@@ -150,17 +131,15 @@ export default function MyOrdersPage() {
   // --- Review Mutation ---
   const submitReview = useMutation({
     mutationFn: async (payload: { medicineId: number; orderId: number; rating: number; comment: string }) => {
-      const token = getAuthToken();
       const res = await fetch(`${BASE_URL}/reviews`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          ...(token && { "Authorization": `Bearer ${token}` }),
         },
         body: JSON.stringify({
-            ...payload,
-            rating: Number(payload.rating),
-            comment: payload.comment.trim()
+          ...payload,
+          rating: Number(payload.rating),
+          comment: payload.comment.trim()
         }),
         credentials: "include",
       });
@@ -200,7 +179,7 @@ export default function MyOrdersPage() {
   return (
     <div className="min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/5 via-background to-background pb-20">
       <div className="container mx-auto px-4 py-12 max-w-7xl">
-        
+
         <header className="mb-12">
           <p className="text-primary font-bold text-sm tracking-widest uppercase mb-2">User Dashboard</p>
           <h1 className="text-5xl font-black tracking-tight text-foreground">
@@ -265,7 +244,7 @@ export default function MyOrdersPage() {
                                       <p className="text-xs italic text-muted-foreground">"{item.review.comment}"</p>
                                     </div>
                                   ) : (
-                                    <Button 
+                                    <Button
                                       variant="outline" size="sm" className="w-full rounded-xl text-xs font-bold gap-2"
                                       onClick={() => handleOpenReview(order.id, item.medicineId)}
                                     >
@@ -311,7 +290,7 @@ export default function MyOrdersPage() {
                 ))}
               </div>
             </div>
-            <Textarea 
+            <Textarea
               placeholder="How was the product?"
               className="rounded-2xl min-h-[120px]"
               value={comment}
@@ -319,12 +298,12 @@ export default function MyOrdersPage() {
             />
           </div>
           <DialogFooter>
-            <Button 
+            <Button
               className="w-full rounded-2xl h-14 font-bold"
               disabled={submitReview.isPending || !comment.trim()}
               onClick={() => {
                 if (!selectedItem) return;
-                
+
                 // Front-end check to prevent double-submit UI glitches
                 const isAlreadyDone = orders?.find(o => o.id === selectedItem.orderId)
                   ?.orderItems.find(i => i.medicineId === selectedItem.medicineId)?.review;
@@ -335,11 +314,11 @@ export default function MyOrdersPage() {
                   return;
                 }
 
-                submitReview.mutate({ 
-                    medicineId: selectedItem.medicineId, 
-                    orderId: selectedItem.orderId, 
-                    rating, 
-                    comment 
+                submitReview.mutate({
+                  medicineId: selectedItem.medicineId,
+                  orderId: selectedItem.orderId,
+                  rating,
+                  comment
                 });
               }}
             >
@@ -365,18 +344,18 @@ const getStatusStyles = (status: string) => {
 };
 
 function ErrorUI({ message }: { message: string }) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[80vh] text-center px-4">
-        <div className="bg-destructive/10 p-6 rounded-full mb-6">
-          <AlertCircle className="h-12 w-12 text-destructive" />
-        </div>
-        <h2 className="text-2xl font-bold mb-2">Something went wrong</h2>
-        <p className="text-muted-foreground mb-8 max-w-md">{message}</p>
-        <Button onClick={() => window.location.reload()} variant="outline" className="rounded-full px-8">
-          Try Again
-        </Button>
+  return (
+    <div className="flex flex-col items-center justify-center min-h-[80vh] text-center px-4">
+      <div className="bg-destructive/10 p-6 rounded-full mb-6">
+        <AlertCircle className="h-12 w-12 text-destructive" />
       </div>
-    );
+      <h2 className="text-2xl font-bold mb-2">Something went wrong</h2>
+      <p className="text-muted-foreground mb-8 max-w-md">{message}</p>
+      <Button onClick={() => window.location.reload()} variant="outline" className="rounded-full px-8">
+        Try Again
+      </Button>
+    </div>
+  );
 }
 
 function UnauthorizedUI() {
@@ -398,10 +377,10 @@ function EmptyOrdersUI() {
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4">
       <div className="relative mb-6">
-         <ShoppingBag className="h-24 w-24 text-muted/20" />
-         <div className="absolute inset-0 flex items-center justify-center">
-            <Package className="h-8 w-8 text-muted-foreground/40" />
-         </div>
+        <ShoppingBag className="h-24 w-24 text-muted/20" />
+        <div className="absolute inset-0 flex items-center justify-center">
+          <Package className="h-8 w-8 text-muted-foreground/40" />
+        </div>
       </div>
       <h2 className="text-3xl font-bold tracking-tight">No orders yet</h2>
       <p className="text-muted-foreground mt-2 max-w-sm">When you place an order, it will appear here for you to track and review.</p>
