@@ -39,6 +39,9 @@ export async function middleware(request: NextRequest) {
                 "User-Agent": request.headers.get("User-Agent") || "",
                 "Origin": request.headers.get("Origin") || "",
                 "Referer": request.headers.get("Referer") || "",
+                "X-Forwarded-Host": request.nextUrl.host,
+                "X-Forwarded-Proto": request.nextUrl.protocol.replace(":", ""),
+                "X-Forwarded-For": request.headers.get("x-forwarded-for") || "127.0.0.1",
             },
             cache: "no-store",
         });

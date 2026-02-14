@@ -42,6 +42,7 @@ async function proxyRequest(request: NextRequest) {
                 let newValue = value;
                 if (!value.includes("__Secure-better-auth.session_token") && (backendUrl.startsWith("https") || url.hostname === "localhost")) {
                     newValue = value.replace(/better-auth\.session_token=/g, "__Secure-better-auth.session_token=");
+                    console.log(`Proxy: Reprefixed session token for backend ${backendBaseUrl}`);
                 }
                 headers.set(key, newValue);
             } else {
