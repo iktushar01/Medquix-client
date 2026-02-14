@@ -1,53 +1,76 @@
-import { NextRequest, NextResponse } from "next/server";
-import { userService } from "./services/user.service";
-import { Roles } from "./constants/roles";
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
 export async function proxy(request: NextRequest) {
-  const pathname = request.nextUrl.pathname;
+  const { pathname } = request.nextUrl;
 
-  let isAuthenticated = false;
-  let isAdmin = false;
-  let isSeller = false;
-  let isUser = false;
+  // Get session
+  const res = await fetch(`${process.env.AUTH_URL}/get-session`, {
+    headers: {
+      cookie: request.headers.get("cookie") || "",
+    },
+    cache: "no-store",
+  });
 
-  const { data } = await userService.getSession();
+  const sessionData = await res.json();
+  const session = sessionData?.data || sessionData;
 
-  if (data) {
-    isAuthenticated = true;
-    isAdmin = data.user.role === Roles.admin;
-    isSeller = data.user.role === Roles.seller;
-    isUser = data.user.role === Roles.user;
+  const user = session?.user;
+  const role = user?.role; // "customer" | "seller" | "admin"
+
+  /* ================= PUBLIC ROUTES ================= */
+  const publicRoutes = [
+    "/",
+    "/login",
+    "/signup",
+    "/shop",
+  ];
+
+  if (publicRoutes.some((route) => pathname.startsWith(route))) {
+    return NextResponse.next();
   }
 
-  //* User in not authenticated at all
-  if (!isAuthenticated) {
+  /* ================= NOT LOGGED IN ================= */
+  if (!user) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  //* User is authenticated and role = USER
-  //* User can not visit admin-dashboard
-  if (!isAdmin && pathname.startsWith("/admin")) {
-    return NextResponse.redirect(new URL("/", request.url));
+  /* ================= CUSTOMER ROUTES ================= */
+  if (
+    ["/cart", "/checkout", "/orders", "/profile"].some((route) =>
+      pathname.startsWith(route)
+    )
+  ) {
+    if (role !== "customer") {
+      return NextResponse.redirect(new URL("/", request.url));
+    }
   }
-  if (!isSeller && pathname.startsWith("/seller")) {
-    return NextResponse.redirect(new URL("/", request.url));
+
+  /* ================= SELLER ROUTES ================= */
+  if (pathname.startsWith("/seller")) {
+    if (role !== "seller") {
+      return NextResponse.redirect(new URL("/", request.url));
+    }
   }
-  if (!isUser && pathname.startsWith("/cart")) {
-    return NextResponse.redirect(new URL("/", request.url));
-  }
-  if (!isUser && pathname.startsWith("/orders")) {
-    return NextResponse.redirect(new URL("/", request.url));
+
+  /* ================= ADMIN ROUTES ================= */
+  if (pathname.startsWith("/admin")) {
+    if (role !== "admin") {
+      return NextResponse.redirect(new URL("/", request.url));
+    }
   }
 
   return NextResponse.next();
 }
 
+/* ================= MATCHER ================= */
 export const config = {
   matcher: [
-    "/admin/:path*",
-    "/seller/:path*",
-    "/user/:path*",
     "/cart/:path*",
+    "/checkout/:path*",
     "/orders/:path*",
+    "/profile/:path*",
+    "/seller/:path*",
+    "/admin/:path*",
   ],
 };

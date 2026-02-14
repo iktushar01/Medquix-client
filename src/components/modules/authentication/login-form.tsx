@@ -48,23 +48,20 @@ export function LoginForm({
     setError(null);
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ""}/auth/sign-in/email`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ email, password }),
+      const { data, error } = await authClient.signIn.email({
+        email,
+        password,
       });
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Login failed");
-
-      await session.refetch();
+      if (error) {
+        throw new Error(error.message || "Login failed");
+      }
 
       let redirectUrl = "/";
       if (callbackUrl) {
         redirectUrl = callbackUrl;
-      } else if (data.user?.role) {
-        const role = data.user.role.toLowerCase();
+      } else if (data?.user && (data.user as any).role) {
+        const role = (data.user as any).role.toLowerCase();
         if (role === "seller") redirectUrl = "/seller/dashboard";
         else if (role === "admin") redirectUrl = "/admin/dashboard";
       }
@@ -104,6 +101,7 @@ export function LoginForm({
               placeholder="name@example.com"
               required
               value={email}
+              autoComplete="email"
               onChange={(e) => setEmail(e.target.value)}
             />
           </Field>
@@ -117,6 +115,7 @@ export function LoginForm({
                 required
                 className="pr-10"
                 value={password}
+                autoComplete="current-password"
                 onChange={(e) => setPassword(e.target.value)}
               />
               <button

@@ -1,8 +1,24 @@
 import { createAuthClient } from "better-auth/react"
 
 export const authClient = createAuthClient({
-  baseURL: 
-    process.env.NODE_ENV === "production"
-      ? "https://medquix-server.vercel.app"  // deployed backend
-      : "http://localhost:5000"              // local dev
+  baseURL: (typeof window !== "undefined"
+    ? window.location.origin
+    : (process.env.NEXT_PUBLIC_APP_URL || "https://medquix-server.vercel.app")) + "/api/auth",
+  user: {
+    additionalFields: {
+      role: {
+        type: "string",
+        required: false,
+      },
+      phone: {
+        type: "string",
+        required: false,
+      },
+      status: {
+        type: "string",
+        required: false,
+      },
+    },
+  },
 })
+

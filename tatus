@@ -1,0 +1,68 @@
+[33m080ae13[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m order page fix
+[33mc84fe02[m fix url
+[33mec795b3[m createAuthClient fix
+[33m5bccad3[m remove fp
+[33m72290fa[m export const dynamic = force-dynamic;aded
+[33mcad896c[m fix url
+[33me41d5d5[m add role when register
+[33m5143b20[m fix shop details page
+[33me3c81c1[m fix logo in footer
+[33m172e29d[m fix url
+[33maea226a[m seller dashboard export pdf work
+[33m7f1e780[m seller dashboard fetch data and update ui
+[33m2375589[m -private route add for seller user and admin
+[33me3c0b4b[m add about page
+[33mb171af7[m profile clean
+[33m44bf3dd[m customer profile page added and get data
+[33m8c1dcd8[m Search and filter by category, price, manufacturer
+[33mae075ae[m get review in medicine details
+[33m958dbcc[m my order section review add
+[33m17e27b3[m signup page update
+[33me202d9d[m login with demo credential role base added in login page
+[33m38ed5b6[m admin dashboard added with real data
+[33m130916c[m admin all orders view only
+[33mfb33e90[m dark mode add in swalert
+[33m4008a07[m Category add page added
+[33m77bc6c9[m medicine list get and update and delete api writen
+[33meeec022[m update all page medistore to medquix
+[33m5319ae1[m make a support page
+[33m16e3061[m term and condition page added
+[33mf318132[m add privacy page
+[33mcbe069b[m page error page
+[33m11f376d[m status ban unban features added
+[33me6d7b8b[m admin all user list page added and fetch data from server
+[33mdc281b5[m home page banner section update
+[33me6d479b[m 2 demo section in home page
+[33m29a94a7[m seller dashboard added but not complete yet
+[33m864ccb2[m order page added in seller pages
+[33me743d71[m details page for medicine by id seller page
+[33meaa8fb4[m logout sweetalet2 added
+[33mab230e5[m order page added and fetch my user data
+[33mb0357fb[m update quantity and delete card item api work ok
+[33ma00dbc7[m card data fetch working
+[33me9fcb67[m customer end shop ui update
+[33mf8a977e[m delete api added in seller medicine
+[33m2c0c5a8[m patch req apply for medicine edit id ... update medicine
+[33me10ebcd[m seller medicine added
+[33mccfc8d7[m medicine data fetch add in seller medicine page
+[33m54da77f[m sidebar ui improve
+[33md741c37[m login page redirect done with rolebase auth fetch
+[33mccba1aa[m login post api added fecth ok
+[33mb612e39[m signup work with better auth email password
+[33m18c3a51[m fetching signup api and post data in DB
+[33m09a216d[m sidebar layout stucture fix
+[33m3bb9328[m  proxy.ts page added role base private routing
+[33ma79818a[m details page added in shop
+[33me2c217d[m ui improve of shop page
+[33m31455fc[m sidebar added and shop page info fetching done
+[33maf325fc[m middleware.ts
+[33m185fa42[m role base route added in navbar
+[33m84bbf1f[m navbar get user and if no user ther login signin and if user then profile signout
+[33m47b4d2b[m useSession.ts file added
+[33m157ce4b[m getSession data in server component using fetch
+[33m8d7954b[m Authentication with Google OAuth added
+[33m0214e56[m basic Carousel added for home page
+[33ma5dfab6[m medquix logo added
+[33m5997dfa[m light dark mode added and sign in signui page added
+[33m3905402[m add navbar form https://www.shadcnblocks.com/block/navbar1
+[33ma2f64d6[m Initial commit from Create Next App
