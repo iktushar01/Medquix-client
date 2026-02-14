@@ -1,12 +1,12 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { 
-  Package, AlertCircle, DollarSign, Activity, 
-  ArrowUpRight, Layers 
+import {
+  Package, AlertCircle, DollarSign, Activity,
+  ArrowUpRight, Layers
 } from "lucide-react";
-import { 
-  AreaChart, Area, XAxis, YAxis, CartesianGrid, 
-  Tooltip, ResponsiveContainer 
+import {
+  AreaChart, Area, XAxis, YAxis, CartesianGrid,
+  Tooltip, ResponsiveContainer
 } from "recharts";
 
 // Correct PDF Imports to avoid "not a function" errors
@@ -30,7 +30,7 @@ export default function ModernSellerDashboard() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/medicines`);
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/medicines`);
         const result = await res.json();
         if (result.success) setMedicines(result.data);
       } catch (err) {
@@ -48,8 +48,8 @@ export default function ModernSellerDashboard() {
     const timestamp = new Date().toLocaleString();
 
     // 1. Top Emerald Accent Bar
-    doc.setFillColor(16, 185, 129); 
-    doc.rect(0, 0, 210, 15, "F"); 
+    doc.setFillColor(16, 185, 129);
+    doc.rect(0, 0, 210, 15, "F");
 
     // 2. MedQuix Branding
     doc.setFont("helvetica", "bold");
@@ -88,8 +88,8 @@ export default function ModernSellerDashboard() {
       head: [tableColumn],
       body: tableRows,
       theme: 'grid',
-      headStyles: { 
-        fillColor: [16, 185, 129], 
+      headStyles: {
+        fillColor: [16, 185, 129],
         textColor: [255, 255, 255],
         fontSize: 10,
         fontStyle: 'bold'
@@ -131,7 +131,7 @@ export default function ModernSellerDashboard() {
   return (
     <div className="min-h-screen bg-background text-foreground p-6 lg:p-10">
       <div className="max-w-7xl mx-auto space-y-10">
-        
+
         {/* --- Header --- */}
         <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
@@ -143,7 +143,7 @@ export default function ModernSellerDashboard() {
             </p>
           </div>
           <div className="flex gap-3">
-            <button 
+            <button
               onClick={exportToPDF}
               className="px-6 py-2.5 bg-emerald-600 text-white rounded-xl font-bold hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-900/10 active:scale-95"
             >
@@ -173,8 +173,8 @@ export default function ModernSellerDashboard() {
                 <AreaChart data={medicines}>
                   <defs>
                     <linearGradient id="colorStock" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.2}/>
-                      <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.2} />
+                      <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(0,0,0,0.05)" />

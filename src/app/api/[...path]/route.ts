@@ -1,20 +1,35 @@
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
-    return proxyAuth(request);
+    return proxyRequest(request);
 }
 
 export async function POST(request: NextRequest) {
-    return proxyAuth(request);
+    return proxyRequest(request);
 }
 
-async function proxyAuth(request: NextRequest) {
+export async function PATCH(request: NextRequest) {
+    return proxyRequest(request);
+}
+
+export async function DELETE(request: NextRequest) {
+    return proxyRequest(request);
+}
+
+export async function PUT(request: NextRequest) {
+    return proxyRequest(request);
+}
+
+async function proxyRequest(request: NextRequest) {
     const url = new URL(request.url);
-    const path = url.pathname.replace(/^\/api\/auth/, "");
+    const path = url.pathname.replace(/^\/api/, ""); // Remove local /api prefix
     const searchParams = url.searchParams.toString();
 
-    const backendBaseUrl = process.env.AUTH_URL ? process.env.AUTH_URL.replace(/\/api\/auth\/?$/, "") : (process.env.BACKEND_URL || "https://medquix-server.vercel.app");
-    const backendUrl = `${backendBaseUrl}/api/auth${path}${searchParams ? `?${searchParams}` : ""}`;
+    // Determine backend base URL
+    const backendBaseUrl = (process.env.BACKEND_URL || "https://medquix-server.vercel.app").replace(/\/$/, "");
+    const backendUrl = `${backendBaseUrl}/api${path}${searchParams ? `?${searchParams}` : ""}`;
+
+    console.log(`Proxying ${request.method} ${url.pathname} -> ${backendUrl}`);
 
     // Filter and clone headers
     const headers = new Headers();
@@ -39,7 +54,7 @@ async function proxyAuth(request: NextRequest) {
         const res = await fetch(backendUrl, {
             method: request.method,
             headers: headers,
-            body: request.method === "POST" ? await request.blob() : undefined,
+            body: ["POST", "PATCH", "PUT"].includes(request.method) ? await request.blob() : undefined,
             cache: "no-store",
             redirect: "manual"
         });
@@ -89,7 +104,7 @@ async function proxyAuth(request: NextRequest) {
         });
     } catch (error) {
         console.error("Proxy error:", error);
-        return new Response(JSON.stringify({ error: "Authentication proxy error" }), {
+        return new Response(JSON.stringify({ error: "API proxy error" }), {
             status: 500,
             headers: { "Content-Type": "application/json" },
         });
