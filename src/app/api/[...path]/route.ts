@@ -1,31 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(request: NextRequest) {
-    return proxyRequest(request);
-}
-
-export async function POST(request: NextRequest) {
-    return proxyRequest(request);
-}
-
-export async function PATCH(request: NextRequest) {
-    return proxyRequest(request);
-}
-
-export async function DELETE(request: NextRequest) {
-    return proxyRequest(request);
-}
-
-export async function PUT(request: NextRequest) {
-    return proxyRequest(request);
-}
+export async function GET(request: NextRequest) { return proxyRequest(request); }
+export async function POST(request: NextRequest) { return proxyRequest(request); }
+export async function PATCH(request: NextRequest) { return proxyRequest(request); }
+export async function DELETE(request: NextRequest) { return proxyRequest(request); }
+export async function PUT(request: NextRequest) { return proxyRequest(request); }
 
 async function proxyRequest(request: NextRequest) {
     const url = new URL(request.url);
-    const path = url.pathname.replace(/^\/api/, ""); // Remove local /api prefix
+    // Remove local /api prefix to get the actual backend path
+    const path = url.pathname.replace(/^\/api/, ""); 
     const searchParams = url.searchParams.toString();
 
-    // Determine backend base URL
     const backendBaseUrl = (process.env.BACKEND_URL || "https://medquix-server.vercel.app").replace(/\/$/, "");
     const backendUrl = `${backendBaseUrl}/api${path}${searchParams ? `?${searchParams}` : ""}`;
 
@@ -34,15 +20,14 @@ async function proxyRequest(request: NextRequest) {
     // Filter and clone headers
     const headers = new Headers();
     const headersToSkip = ["host", "connection", "content-length"];
+    
     request.headers.forEach((value, key) => {
         if (!headersToSkip.includes(key.toLowerCase())) {
-            // Re-prefix cookies when forwarding to backend if they were de-prefixed correctly in browser
-            // Better-auth production REQUIRES __Secure- prefix on HTTPS
             if (key.toLowerCase() === "cookie") {
                 let newValue = value;
+                // Better-auth production REQUIRES __Secure- prefix on HTTPS
                 if (!value.includes("__Secure-better-auth.session_token") && (backendUrl.startsWith("https") || url.hostname === "localhost")) {
                     newValue = value.replace(/better-auth\.session_token=/g, "__Secure-better-auth.session_token=");
-                    console.log(`Proxy: Reprefixed session token for backend ${backendBaseUrl}`);
                 }
                 headers.set(key, newValue);
             } else {
@@ -51,23 +36,32 @@ async function proxyRequest(request: NextRequest) {
         }
     });
 
-    // Add standard proxy headers
     headers.set("X-Forwarded-Host", url.host);
     headers.set("X-Forwarded-Proto", url.protocol.replace(":", ""));
 
     try {
-        const res = await fetch(backendUrl, {
+        // Prepare fetch options
+        const fetchOptions: RequestInit = {
             method: request.method,
             headers: headers,
-            body: ["POST", "PATCH", "PUT"].includes(request.method) ? await request.blob() : undefined,
             cache: "no-store",
             redirect: "manual"
-        });
+        };
 
-        const body = await res.blob();
+        // Only attach body for methods that typically have one
+        if (["POST", "PATCH", "PUT"].includes(request.method)) {
+            const contentType = request.headers.get("content-type") || "";
+            if (contentType.includes("application/json")) {
+                fetchOptions.body = JSON.stringify(await request.json());
+            } else {
+                fetchOptions.body = await request.blob();
+            }
+        }
+
+        const res = await fetch(backendUrl, fetchOptions);
         const responseHeaders = new Headers();
 
-        // Handle all headers except Set-Cookie and decoding-related headers
+        // Skip headers that should be handled by the proxy or the browser
         const headersToSkipResponse = ["set-cookie", "content-encoding", "content-length"];
         res.headers.forEach((value, key) => {
             if (!headersToSkipResponse.includes(key.toLowerCase())) {
@@ -75,16 +69,13 @@ async function proxyRequest(request: NextRequest) {
             }
         });
 
-        // Specialized handling for Set-Cookie to ensure multiple cookies and attributes are handled
-        // @ts-ignore - getSetCookie is available in modern runtimes like Vercel and Node 18+
-        const setCookies = res.headers.getSetCookie?.() || res.headers.get("set-cookie")?.split(", ") || [];
+        // Handle Set-Cookie
+        // @ts-ignore
+        const setCookies = res.headers.getSetCookie?.() || [];
 
         setCookies.forEach((cookie: string) => {
-            let processedCookie = cookie
-                .replace(/Domain=[^;]+;?\s*/gi, ""); // Remove Domain attribute
+            let processedCookie = cookie.replace(/Domain=[^;]+;?\s*/gi, "");
 
-            // If on localhost (not on https), remove Secure and set SameSite to Lax
-            // De-prefix __Secure- to allow browser to accept it on HTTP
             if (url.hostname === "localhost") {
                 processedCookie = processedCookie
                     .replace(/;\s*Secure/gi, "")
@@ -94,22 +85,20 @@ async function proxyRequest(request: NextRequest) {
                     processedCookie = processedCookie.replace(/SameSite=None/gi, "SameSite=Lax");
                 }
             }
-
-            // Sync logging
-            if (processedCookie.includes("better-auth.session_token")) {
-                console.log("Renamed session token for browser:", processedCookie.split(';')[0]);
-            }
-
             responseHeaders.append("Set-Cookie", processedCookie);
         });
 
-        return new Response(body, {
+        // Get body as blob to handle both text and binary (images, etc)
+        const responseBody = await res.blob();
+
+        return new Response(responseBody, {
             status: res.status,
             headers: responseHeaders,
         });
+
     } catch (error) {
         console.error("Proxy error:", error);
-        return new Response(JSON.stringify({ error: "API proxy error" }), {
+        return new Response(JSON.stringify({ error: "API proxy error", message: error instanceof Error ? error.message : String(error) }), {
             status: 500,
             headers: { "Content-Type": "application/json" },
         });
