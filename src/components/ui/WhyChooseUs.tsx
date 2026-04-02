@@ -1,47 +1,60 @@
-import { Truck, ShieldCheck, Users, Clock } from "lucide-react";
+import { Activity, ShieldCheck, Store, Truck } from "lucide-react";
 
 export function WhyChooseUs() {
   const features = [
     {
-      icon: <Truck className="h-8 w-8 text-primary" />,
-      title: "Fast Delivery",
-      description: "Get your medicines delivered to your doorstep within 24 hours of ordering."
+      icon: <Truck className="h-7 w-7 text-primary" />,
+      title: "Fast local fulfillment",
+      description:
+        "From cart to doorstep, the ordering path is built to keep routine medicine purchases moving quickly."
     },
     {
-      icon: <ShieldCheck className="h-8 w-8 text-primary" />,
-      title: "Trusted Sellers",
-      description: "Every pharmacy on our platform is verified and licensed by health authorities."
+      icon: <ShieldCheck className="h-7 w-7 text-primary" />,
+      title: "Protected role access",
+      description:
+        "Customers, sellers, and admins stay in their proper areas, reducing confusion and improving control."
     },
     {
-      icon: <Clock className="h-8 w-8 text-primary" />,
-      title: "24/7 Support",
-      description: "Our customer service team is always available to help with your orders."
+      icon: <Store className="h-7 w-7 text-primary" />,
+      title: "Operational seller tools",
+      description:
+        "Sellers can manage stock, medicines, and orders through dedicated dashboard flows that feel focused."
     },
     {
-      icon: <Users className="h-8 w-8 text-primary" />,
-      title: "Quality Medicines",
-      description: "We only list OTC medicines from reputable global and local manufacturers."
+      icon: <Activity className="h-7 w-7 text-primary" />,
+      title: "Healthcare-first clarity",
+      description:
+        "The homepage and shopping layout are now designed to guide customers through decisions with less friction."
     }
   ];
 
   return (
-    <section className="py-20 bg-slate-50 dark:bg-slate-900/50">
+    <section className="bg-background py-20 text-foreground md:py-24">
       <div className="container mx-auto px-4">
-        <div className="text-center max-w-2xl mx-auto mb-16">
-          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl mb-4">Why Choose MedQuix?</h2>
-          <p className="text-muted-foreground">
-            We bridge the gap between local pharmacies and customers, ensuring safe and accessible healthcare for everyone.
+        <div className="mx-auto mb-16 max-w-3xl text-center">
+          <span className="inline-flex rounded-full border border-primary/15 bg-accent px-4 py-2 text-xs font-bold uppercase tracking-[0.25em] text-primary">
+            Why MedQuix
+          </span>
+          <h2 className="mt-5 font-serif text-3xl font-black tracking-tight sm:text-4xl">
+            A storefront for customers, with stronger structure behind the scenes.
+          </h2>
+          <p className="mt-4 text-base leading-8 text-muted-foreground">
+            These improvements are not just visual. The platform now communicates
+            trust, route separation, and smoother commerce more clearly.
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {features.map((feature, index) => (
-            <div key={index} className="bg-white dark:bg-slate-950 p-8 rounded-2xl shadow-sm border hover:border-primary/50 transition-colors">
-              <div className="mb-4 inline-block p-3 bg-primary/10 rounded-xl">
+            <div
+              key={index}
+              className="rounded-[1.75rem] border border-border bg-card p-8 shadow-sm transition hover:-translate-y-1 hover:border-primary/20 hover:shadow-md"
+            >
+              <div className="mb-5 inline-flex rounded-2xl bg-accent p-3">
                 {feature.icon}
               </div>
-              <h3 className="text-xl font-bold mb-2">{feature.title}</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
+              <h3 className="mb-3 text-xl font-bold text-foreground">{feature.title}</h3>
+              <p className="text-sm leading-7 text-muted-foreground">
                 {feature.description}
               </p>
             </div>
