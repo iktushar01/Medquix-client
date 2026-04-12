@@ -10,7 +10,6 @@ import {
   FieldSeparator,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { handleGoogleLogin } from "@/lib/handleGoogleLogin";
 import { useState, useCallback, useMemo } from "react";
 import { uploadToImgbb } from "@/lib/uploadToImgbb";
 import { Eye, EyeOff } from "lucide-react";
@@ -43,7 +42,7 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"form">
     image: "",
     role: "user", // Default role
   });
-  
+
   const [errors, setErrors] = useState<FormErrors>({});
   const [loading, setLoading] = useState(false);
   const [imageUploading, setImageUploading] = useState(false);
@@ -178,7 +177,7 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"form">
           )}
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-             {/* Role Selection Dropdown */}
+            {/* Role Selection Dropdown */}
             <Field>
               <FieldLabel htmlFor="role">I want to register as</FieldLabel>
               <select
@@ -245,12 +244,6 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"form">
 
           <Button type="submit" disabled={loading || imageUploading || !isFormValid} className="w-full">
             {loading ? "Creating..." : "Sign Up"}
-          </Button>
-
-          <FieldSeparator>Or</FieldSeparator>
-
-          <Button onClick={handleGoogleLogin} variant="outline" type="button" className="w-full">
-            Google
           </Button>
         </FieldGroup>
       </form>
