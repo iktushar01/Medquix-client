@@ -9,13 +9,15 @@ const roleLinks: Record<string, string> = {
 };
 
 export async function middleware(request: NextRequest) {
-    const { pathname } = request.nextUrl;
-    const localAppUrl = process.env.NEXT_PUBLIC_APP_URL || request.nextUrl.origin;
+    const { pathname, origin } = request.nextUrl;
 
-    // 1. Get Session from the proxy endpoint
+    // Use current origin to call the local proxy/API
+    // This avoids issues where NEXT_PUBLIC_APP_URL points to production
+    const localApiUrl = `${origin}/api/auth/get-session`;
+
     try {
         const cookieHeader = request.headers.get("cookie") || "";
-        const res = await fetch(`${localAppUrl}/api/auth/get-session`, {
+        const res = await fetch(localApiUrl, {
             headers: {
                 cookie: cookieHeader,
             },
@@ -25,21 +27,23 @@ export async function middleware(request: NextRequest) {
         const session = await res.json();
         const user = session?.user;
 
-        // If not logged in and trying to access matcher-protected routes
+        // If not logged in and accessing protected routes
         if (!user) {
             return NextResponse.redirect(new URL("/login", request.url));
         }
 
-        const role = user.role as keyof typeof roleLinks;
+        // Handle case-sensitivity for roles
+        const role = (user.role || "").toLowerCase() as keyof typeof roleLinks;
         const redirectPath = roleLinks[role];
 
+        // If role is unknown, just allow (or handle as user)
         if (!redirectPath) return NextResponse.next();
 
         // --- Role-based Redirection Logic ---
 
         // Customer (user/customer) trying to access Admin or Seller routes
         if ((role === "user" || role === "customer") && (pathname.startsWith("/admin") || pathname.startsWith("/seller"))) {
-            return NextResponse.redirect(new URL(roleLinks[role], request.url));
+            return NextResponse.redirect(new URL(redirectPath, request.url));
         }
 
         // Seller trying to access Admin or Customer-specific routes
